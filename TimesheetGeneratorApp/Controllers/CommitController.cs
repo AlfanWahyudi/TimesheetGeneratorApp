@@ -30,22 +30,6 @@ namespace TimesheetGeneratorApp.Controllers
             parameterModel = new ParameterModel();
         }
 
-        //public string test_api()
-        //{
-        //    var dataGitlab = _gitlabService.getList(121, "vkembo3-uC1e3y1NPpP3", "2022-09-01", "2022-09-30", "true", "true", "100");
-        //    int count = 0;
-
-        //    string dataArray = "";
-
-        //    foreach (var item in dataGitlab)
-        //    {
-        //        count++;
-        //        dataArray = item.ToString();
-        //    }
-
-        //    return "" + dataGitlab + dataArray + "        Jumlah Data: " + count;
-        //}
-
         // GET: Commit
         public async Task<IActionResult> Index()
         {
@@ -79,7 +63,41 @@ namespace TimesheetGeneratorApp.Controllers
                                                     generateCommit.tanggal_mulai.ToString(),
                                                     generateCommit.tanggal_selesai.ToString(),
                                                     "true", "true", "100");
-            
+
+            //TODO: Save Data Gitlab API to DB
+            foreach (GitlabCommitModel item in gitlabData)
+            {
+                CommitModel cm = new CommitModel();
+                cm.message = item.message;
+                cm.committed_date = null;
+                cm.jumlah_jam = 8;
+                cm.jam_mulai = null;
+                cm.jam_akhir = null;
+                cm.author_name = item.author_name;
+
+                _context.CommitModel.Add(cm);
+                _context.SaveChanges();
+
+                //return Ok(
+                //    new { Results = gitlabData }
+                //);
+
+
+                //foreach (var item in obj)
+                //{
+                //    CommitModel cm = new CommitModel();
+                //    cm.message = item.message;
+                //    cm.committed_date = item.committed_date;
+                //    cm.jumlah_jam = 8;
+                //    cm.jam_mulai = item.committed_date;
+                //    cm.jam_akhir = item.committed_date;
+                //    cm.author_name = item.author_name;
+
+                //    _context.CommitModel.Add(cm);
+                //}
+
+            }
+
             return Ok(
                 new { Results = gitlabData }
             );
