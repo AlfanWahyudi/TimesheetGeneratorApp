@@ -1,0 +1,23 @@
+﻿<nav id="sidebar" class="sidebar js-sidebar">
+	<div class="sidebar-content js-simplebar">
+		<a class="sidebar-brand" href="index.html">
+			<span class="align-middle">Timesheet Generator</span>
+		</a>
+
+		<ul class="sidebar-nav">
+			<li class="sidebar-header">
+				Pages
+			</li>
+			<li class="sidebar-item @ViewData["menu_master_project"]">
+				<a class="sidebar-link" href="@Url.Action("","")">
+					<i class="align-middle" data-feather="user"></i> <span class="align-middle">Master Project</span>
+				</a>
+			</li>
+			<li class="sidebar-item @ViewData["menu_commit"]">
+				<a class="sidebar-link" href="@Url.Action("","commit")">
+					<i class="align-middle" data-feather="user"></i> <span class="align-middle">Data commit</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+</nav>
