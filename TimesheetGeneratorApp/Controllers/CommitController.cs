@@ -26,7 +26,7 @@ namespace TimesheetGeneratorApp.Controllers
 
             _context_mp = context_mp;
             _httpClient = new HttpClient();
-            _gitlabService = new GitlabService(_httpClient);
+            _gitlabService = new GitlabService(_httpClient, this);
             parameterModel = new ParameterModel();
         }
 
@@ -63,6 +63,11 @@ namespace TimesheetGeneratorApp.Controllers
                                                     generateCommit.tanggal_mulai.ToString(),
                                                     generateCommit.tanggal_selesai.ToString(),
                                                     "true", "true", "100");
+            //Todo : check error system
+            if(gitlabData == null)
+            {
+                return RedirectToAction("");
+            }
 
             //TODO: Save Data Gitlab API to DB
             foreach (GitlabCommitModel item in gitlabData)
@@ -98,9 +103,8 @@ namespace TimesheetGeneratorApp.Controllers
 
             }
 
-            return Ok(
-                new { Results = gitlabData }
-            );
+            TempData["message_success"] = "Berhasil melakukan generate data";
+            return RedirectToAction("");
 
         }
 

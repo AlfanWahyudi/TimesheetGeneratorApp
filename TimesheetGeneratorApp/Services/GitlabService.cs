@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Collections;
 using TimesheetGeneratorApp.Models;
 
@@ -8,11 +9,13 @@ namespace TimesheetGeneratorApp.Services
     {
         public string url;
         private HttpClient client;
+        Controller ctr;
 
-        public GitlabService(HttpClient httpClient)
+        public GitlabService(HttpClient httpClient, Controller ctr)
         {
             this.client = httpClient;
             this.url = "/api/v4/projects/";
+            this.ctr = ctr;
         }
 
         public ArrayList getList(string hostUrl, string projectId, string access_token, string since, string until, string all, string with_stats, string per_page)
@@ -23,7 +26,7 @@ namespace TimesheetGeneratorApp.Services
 
             var totalPages = this.getTotalPages(hostUrl, projectId, access_token, since, until, all, with_stats, per_page);
 
-            if (totalPages != 0)
+            if (totalPages > 0)
             {
                 var iter = 1;
                 while (iter <= totalPages)
@@ -56,7 +59,7 @@ namespace TimesheetGeneratorApp.Services
                 return data;
             }
 
-            throw new HttpRequestException("Ada Error Nih");
+            return null;
 
         }
 
@@ -68,7 +71,7 @@ namespace TimesheetGeneratorApp.Services
                                     + "&" + "all=" + all
                                     + "&" + "with_stats=" + with_stats
                                     + "&" + "per_page=" + per_page).Result;
-
+            
             var responseMessage = response.Content.ReadAsStringAsync().Result;
 
             if (response.IsSuccessStatusCode)
@@ -78,8 +81,8 @@ namespace TimesheetGeneratorApp.Services
 
                 if (response.Headers.Contains("X-Total-Pages")) return int.Parse(response.Headers.GetValues("X-Total-Pages").First());
             }
-
-            throw new HttpRequestException(responseMessage);
+            this.ctr.TempData["error_system"] = responseMessage;
+            return -1;
 
         }
     }
