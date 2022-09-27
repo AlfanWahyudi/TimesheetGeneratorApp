@@ -34,7 +34,7 @@ namespace TimesheetGeneratorApp.Controllers
             }
 
             var masterProjectModel = await _context.MasterProjectModel
-                .FirstOrDefaultAsync(m => m.id == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (masterProjectModel == null)
             {
                 return NotFound();
@@ -62,6 +62,11 @@ namespace TimesheetGeneratorApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            var errors = ModelState.Select(x => x.Value.Errors)
+                           .Where(y => y.Count > 0)
+                           .ToList();
+            TempData["error_system"] = errors;
+
             return View(masterProjectModel);
         }
 
@@ -88,7 +93,7 @@ namespace TimesheetGeneratorApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("id,name,project_id,version_control,host_url,accsess_token,username,password")] MasterProjectModel masterProjectModel)
         {
-            if (id != masterProjectModel.id)
+            if (id != masterProjectModel.Id)
             {
                 return NotFound();
             }
@@ -102,7 +107,7 @@ namespace TimesheetGeneratorApp.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MasterProjectModelExists(masterProjectModel.id))
+                    if (!MasterProjectModelExists(masterProjectModel.Id))
                     {
                         return NotFound();
                     }
@@ -125,7 +130,7 @@ namespace TimesheetGeneratorApp.Controllers
             }
 
             var masterProjectModel = await _context.MasterProjectModel
-                .FirstOrDefaultAsync(m => m.id == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (masterProjectModel == null)
             {
                 return NotFound();
@@ -155,7 +160,7 @@ namespace TimesheetGeneratorApp.Controllers
 
         private bool MasterProjectModelExists(int id)
         {
-          return _context.MasterProjectModel.Any(e => e.id == id);
+          return _context.MasterProjectModel.Any(e => e.Id == id);
         }
     }
 }

@@ -19,24 +19,24 @@
         <form asp-action="generate" method="get">
             <div class="form-group mb-3">
                 <label class="form-label">Project</label>
-                <select class="form-control" name="project_id">
-                    @foreach (var item in ViewBag.mp){
-                        <option value="@item.id">@item.name  -  @item.version_control</option>
-                    }
-                </select>
+                    <select class="form-control" name="project_id" required >
+                        @foreach (var item in ViewBag.mp){
+                            <option value="@item.Id">@item.name  -  @item.version_control</option>
+                        }
+                    </select>
             </div>
             <div class="row">
                 <div class="mb-3 col-md-6 col-12">
                     <div class="form-group mb-3">
                         <label class="form-label">Tanggal mulai</label>
-                        <input type="date" class="form-control" name="tanggal_mulai" />
+                        <input type="date" class="form-control" name="tanggal_mulai" required/>
                     </div>
                 </div>          
 
                 <div class="mb-3 col-md-6 col-12">
                     <div class="form-group mb-3">
                         <label class="form-label">Tanggal selesai</label>
-                        <input type="date" class="form-control" name="tanggal_selesai" />
+                        <input type="date" class="form-control" name="tanggal_selesai" required/>
                     </div>
                 </div>
             </div>

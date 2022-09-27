@@ -55,7 +55,7 @@ namespace TimesheetGeneratorApp.Controllers
 
 
             //TODO: Generate API data
-            var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.id == generateCommit.project_id);
+            var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.Id == generateCommit.project_id);
 
             var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
                                                     masterProjectModel.project_id,
@@ -79,6 +79,7 @@ namespace TimesheetGeneratorApp.Controllers
                 cm.jam_mulai = null;
                 cm.jam_akhir = null;
                 cm.author_name = item.author_name;
+                cm.MasterProjectModelId = generateCommit.project_id;
 
                 _context.CommitModel.Add(cm);
                 _context.SaveChanges();
