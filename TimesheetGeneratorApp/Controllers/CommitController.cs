@@ -7,23 +7,39 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TimesheetGeneratorApp.Data;
 using TimesheetGeneratorApp.Models;
+using TimesheetGeneratorApp.Services;
 
 namespace TimesheetGeneratorApp.Controllers
 {
     public class CommitController : Controller
     {
         private readonly CommitContext _context;
+        private HttpClient _httpClient;
+        private GitlabService _gitlabService;
+        private ParameterModel parameterModel;
 
         public CommitController(CommitContext context)
         {
             _context = context;
+            _httpClient = new HttpClient();
+            _gitlabService = new GitlabService(_httpClient);
+            parameterModel = new ParameterModel();
         }
 
-        public IActionResult test_api()
+        public string test_api()
         {
-            return Ok(new { 
-                result = "test berhasil"
-            });
+            var dataGitlab = _gitlabService.getList(121, "vkembo3-uC1e3y1NPpP3", "2022-09-01", "2022-09-30", "true", "true", "100");
+            int count = 0;
+
+            string dataArray = "";
+
+            foreach (var item in dataGitlab)
+            {
+                count++;
+                dataArray = item.ToString();
+            }
+
+            return "" + dataGitlab + dataArray + "        Jumlah Data: " + count;
         }
 
         // GET: Commit
