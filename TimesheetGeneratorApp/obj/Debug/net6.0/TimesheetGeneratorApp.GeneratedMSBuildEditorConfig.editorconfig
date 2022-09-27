@@ -8,89 +8,89 @@ build_property.PlatformNeutralAssembly =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = TimesheetGeneratorApp
 build_property.RootNamespace = TimesheetGeneratorApp
-build_property.ProjectDir = C:\Users\USER\source\repos\TimesheetGeneratorApp\TimesheetGeneratorApp\
+build_property.ProjectDir = D:\Development\latihan_coding\asp-dotnet\TimesheetGeneratorApp\TimesheetGeneratorApp\
 build_property.RazorLangVersion = 6.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\USER\source\repos\TimesheetGeneratorApp\TimesheetGeneratorApp
+build_property.MSBuildProjectDirectory = D:\Development\latihan_coding\asp-dotnet\TimesheetGeneratorApp\TimesheetGeneratorApp
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Create.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWl0XENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Delete.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWl0XERlbGV0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Details.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWl0XERldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Edit.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWl0XEVkaXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Index.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Commit/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWl0XEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Home/Index.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Home/Privacy.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Create.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyUHJvamVjdFxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Delete.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyUHJvamVjdFxEZWxldGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Details.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyUHJvamVjdFxEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Edit.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyUHJvamVjdFxFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Index.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyUHJvamVjdFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/_form.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/MasterProject/_form.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWFzdGVyUHJvamVjdFxfZm9ybS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/Error.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/_nav_menu_admin.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/_nav_menu_admin.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9uYXZfbWVudV9hZG1pbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/_template_admin.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/_template_admin.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF90ZW1wbGF0ZV9hZG1pbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/_ValidationScriptsPartial.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/_ViewImports.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/_ViewStart.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/USER/source/repos/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/_Layout.cshtml]
+[D:/Development/latihan_coding/asp-dotnet/TimesheetGeneratorApp/TimesheetGeneratorApp/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-1r18aaaits

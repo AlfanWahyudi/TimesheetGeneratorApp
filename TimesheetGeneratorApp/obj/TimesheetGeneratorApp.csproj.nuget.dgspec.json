@@ -1,23 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\USER\\source\\repos\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\TimesheetGeneratorApp.csproj": {}
+    "D:\\Development\\latihan_coding\\asp-dotnet\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\TimesheetGeneratorApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\USER\\source\\repos\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\TimesheetGeneratorApp.csproj": {
+    "D:\\Development\\latihan_coding\\asp-dotnet\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\TimesheetGeneratorApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\USER\\source\\repos\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\TimesheetGeneratorApp.csproj",
+        "projectUniqueName": "D:\\Development\\latihan_coding\\asp-dotnet\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\TimesheetGeneratorApp.csproj",
         "projectName": "TimesheetGeneratorApp",
-        "projectPath": "C:\\Users\\USER\\source\\repos\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\TimesheetGeneratorApp.csproj",
-        "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\USER\\source\\repos\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\obj\\",
+        "projectPath": "D:\\Development\\latihan_coding\\asp-dotnet\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\TimesheetGeneratorApp.csproj",
+        "packagesPath": "C:\\Users\\S W I F T\\.nuget\\packages\\",
+        "outputPath": "D:\\Development\\latihan_coding\\asp-dotnet\\TimesheetGeneratorApp\\TimesheetGeneratorApp\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\USER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\S W I F T\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
