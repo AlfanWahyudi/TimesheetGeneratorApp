@@ -2,19 +2,19 @@
 {
     public class GitlabCommitModel
     {
-        public string id { get; set; }  
-        public string short_id { get; set; }  
+        public string? id { get; set; }  
+        public string? short_id { get; set; }  
         public DateTime? created_at { get; set; }  
-        public string[] parent_ids { get; set; }  
-        public string title { get; set; }
-        public string message { get; set; }
-        public string author_name { get; set; } 
-        public string author_email { get; set; } 
-        public string authored_date { get; set; } 
-        public string commiter_name { get; set; } 
-        public string commiter_email { get; set; } 
+        public string[]? parent_ids { get; set; }  
+        public string? title { get; set; }
+        public string? message { get; set; }
+        public string? author_name { get; set; } 
+        public string? author_email { get; set; } 
+        public string? authored_date { get; set; } 
+        public string? commiter_name { get; set; } 
+        public string? commiter_email { get; set; } 
         public DateTime? committed_date { get; set; }
-        public string web_url { get; set; }
+        public string? web_url { get; set; }
     }
 }
 

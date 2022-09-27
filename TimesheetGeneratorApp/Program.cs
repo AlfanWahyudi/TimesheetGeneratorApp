@@ -1,4 +1,10 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using TimesheetGeneratorApp.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<MasterProjectContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MasterProjectContext") ?? throw new InvalidOperationException("Connection string 'MasterProjectContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
