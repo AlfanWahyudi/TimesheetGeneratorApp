@@ -12,23 +12,23 @@ namespace TimesheetGeneratorApp.Services
         public GitlabService(HttpClient httpClient)
         {
             this.client = httpClient;
-            this.url = "https://dev.kpk.go.id/gitlab/api/v4/projects/";
+            this.url = "/api/v4/projects/";
         }
 
-        public ArrayList getList(int id, string access_token, string since, string until, string all, string with_stats, string per_page)
+        public ArrayList getList(string hostUrl, string projectId, string access_token, string since, string until, string all, string with_stats, string per_page)
         {
             ArrayList data = new ArrayList();
             HttpResponseMessage response;
             string responseMessage;
 
-            var totalPages = this.getTotalPages(id, access_token, since, until, all, with_stats, per_page);
+            var totalPages = this.getTotalPages(hostUrl, projectId, access_token, since, until, all, with_stats, per_page);
 
             if (totalPages != 0)
             {
                 var iter = 1;
                 while (iter <= totalPages)
                 {
-                    response = client.GetAsync(this.url + id + "/repository/commits?access_token=" + access_token
+                    response = client.GetAsync(hostUrl + this.url + projectId + "/repository/commits?access_token=" + access_token
                                     + "&" + "since=" + since
                                     + "&" + "until=" + until
                                     + "&" + "all=" + all
@@ -60,9 +60,9 @@ namespace TimesheetGeneratorApp.Services
 
         }
 
-        public int getTotalPages(int id, string access_token, string since, string until, string all, string with_stats, string per_page)
+        public int getTotalPages(string hostUrl, string projectId, string access_token, string since, string until, string all, string with_stats, string per_page)
         {
-            var response = client.GetAsync(this.url + id + "/repository/commits?access_token=" + access_token
+            var response = client.GetAsync(hostUrl + this.url + projectId + "/repository/commits?access_token=" + access_token
                                     + "&" + "since=" + since
                                     + "&" + "until=" + until
                                     + "&" + "all=" + all
