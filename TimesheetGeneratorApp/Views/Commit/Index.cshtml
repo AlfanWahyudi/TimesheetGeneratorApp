@@ -1,0 +1,65 @@
+﻿@model IEnumerable<TimesheetGeneratorApp.Models.CommitModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.author_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.message)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.committed_date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.jam_mulai)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.jam_akhir)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.jumlah_jam)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.author_name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.message)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.committed_date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.jam_mulai)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.jam_akhir)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.jumlah_jam)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

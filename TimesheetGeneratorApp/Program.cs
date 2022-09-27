@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using TimesheetGeneratorApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<CommitContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("CommitContext") ?? throw new InvalidOperationException("Connection string 'CommitContext' not found.")));
 builder.Services.AddDbContext<MasterProjectContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MasterProjectContext") ?? throw new InvalidOperationException("Connection string 'MasterProjectContext' not found.")));
 
