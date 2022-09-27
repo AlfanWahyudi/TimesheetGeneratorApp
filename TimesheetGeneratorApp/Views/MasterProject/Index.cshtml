@@ -4,69 +4,93 @@
     Layout = "~/Views/Shared/_template_admin.cshtml";
     ViewData["menu_master_project"] = "active";
 }
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.project_id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.version_control)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.host_url)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.accsess_token)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.username)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.password)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.project_id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.version_control)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.host_url)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.accsess_token)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.username)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.password)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.id">Delete</a>
-            </td>
-        </tr>
+@section Css {
+    <link href="https: //cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" rel="stylesheet" />
 }
-    </tbody>
-</table>
+
+<h1 class="mb-5">Master Project</h1>
+    <a asp-action="Create" class="btn btn-primary text-white mb-3"><i class="fa fa-plus" aria-hidden="true"></i> Add</a>
+<div class="card">
+    <div class="card-body">
+        <div class="card-title mb-3">
+            <h3>Tabel Master Project</h3>
+        </div>
+        <table class="table table-stripped table-hover" id="dataTable">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.project_id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.version_control)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.host_url)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.accsess_token)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.username)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.password)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.project_id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.version_control)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.host_url)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.accsess_token)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.username)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.password)
+                        </td>
+                        <td class="td_btn_action">
+                            <form asp-action="Delete" class="form-delete">
+                                <input type="hidden" name="id" value="@item.id" />
+                                <a class="btn btn-sm btn-primary text-white" asp-action="Edit" asp-route-id="@item.id">
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </a>
+                                
+                                <button type="submit" class="btn btn-sm btn-danger text-white">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                            
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $("#dataTable").DataTable();
+    </script>
+}

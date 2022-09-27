@@ -1,63 +1,24 @@
-﻿@model TimesheetGeneratorApp.Models.MasterProjectModel
-
-@{
+﻿@{
     Layout = "~/Views/Shared/_template_admin.cshtml";
     ViewData["menu_master_project"] = "active";
 }
 
-<h1>Create</h1>
-
-<h4>MasterProjectModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<h1 class="mb-4">
+    <a class="btn btn-info" asp-action="Index"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+    Master Project - Create</h1>
+<div class="card">
+    <div class="card-body">
+        <div class="card-title mb-3">Form</div>
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="name" class="control-label"></label>
-                <input asp-for="name" class="form-control" />
-                <span asp-validation-for="name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="project_id" class="control-label"></label>
-                <input asp-for="project_id" class="form-control" />
-                <span asp-validation-for="project_id" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="version_control" class="control-label"></label>
-                <input asp-for="version_control" class="form-control" />
-                <span asp-validation-for="version_control" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="host_url" class="control-label"></label>
-                <input asp-for="host_url" class="form-control" />
-                <span asp-validation-for="host_url" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="accsess_token" class="control-label"></label>
-                <input asp-for="accsess_token" class="form-control" />
-                <span asp-validation-for="accsess_token" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="username" class="control-label"></label>
-                <input asp-for="username" class="form-control" />
-                <span asp-validation-for="username" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="password" class="control-label"></label>
-                <input asp-for="password" class="form-control" />
-                <span asp-validation-for="password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+            <partial name="_form" />
+            <div class="form-group mb-3 text-end">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
