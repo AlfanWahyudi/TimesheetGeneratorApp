@@ -13,10 +13,12 @@ namespace TimesheetGeneratorApp.Controllers
     public class CommitController : Controller
     {
         private readonly CommitContext _context;
+        private readonly MasterProjectContext _context_mp;
 
-        public CommitController(CommitContext context)
+        public CommitController(CommitContext context, MasterProjectContext context_mp)
         {
             _context = context;
+            _context_mp = context_mp;
         }
 
         public IActionResult test_api()
@@ -29,9 +31,33 @@ namespace TimesheetGeneratorApp.Controllers
         // GET: Commit
         public async Task<IActionResult> Index()
         {
-              return View(await _context.CommitModel.ToListAsync());
+            ViewBag.mp = await _context_mp.MasterProjectModel.ToListAsync();
+            if(TempData["generate"] == null)
+            {
+                return View(await _context.CommitModel.ToListAsync());
+            }else{
+                IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = await _context.CommitModel.ToListAsync();
+                return View(data);
+            }
+        }
+        public async Task<IActionResult> generate(GenerateCommitModel generateCommit)
+        {
+            if (generateCommit.btn_generate.Equals("Tampilkan"))
+            {
+                TempData["generate"] = true;
+                TempData["generate_tanggal_mulai"] = generateCommit.tanggal_mulai;
+                TempData["generate_tanggal_selesai"] = generateCommit.tanggal_selesai;
+                TempData["generate_project_id"] = generateCommit.project_id;
+                return RedirectToAction("Index");
+            }
+
+            return Ok(
+                new { Results = generateCommit }
+            );
+
         }
 
+        
         // GET: Commit/Details/5
         public async Task<IActionResult> Details(int? id)
         {

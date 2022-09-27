@@ -5,62 +5,125 @@
     ViewData["menu_commit"] = "active";
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.author_name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.message)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.committed_date)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.jam_mulai)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.jam_akhir)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.jumlah_jam)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.author_name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.message)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.committed_date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.jam_mulai)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.jam_akhir)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.jumlah_jam)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@section Css {
+    <link href="https: //cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" rel="stylesheet" />
 }
-    </tbody>
-</table>
+
+<h1 class="mb-3">Data commit</h1>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="card-title mb-3">
+            <h4>Generate Data</h4>
+        </div>
+        <form asp-action="generate" method="get">
+            <div class="form-group mb-3">
+                <label class="form-label">Project</label>
+                <select class="form-control" name="project_id">
+                    @foreach (var item in ViewBag.mp){
+                        <option value="@item.id">@item.name  -  @item.version_control</option>
+                    }
+                </select>
+            </div>
+            <div class="row">
+                <div class="mb-3 col-md-6 col-12">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Tanggal mulai</label>
+                        <input type="date" class="form-control" name="tanggal_mulai" />
+                    </div>
+                </div>          
+
+                <div class="mb-3 col-md-6 col-12">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Tanggal selesai</label>
+                        <input type="date" class="form-control" name="tanggal_selesai" />
+                    </div>
+                </div>
+            </div>
+           
+            <div class=" form-group">
+                <input class="btn btn-primary" type="submit" name="btn_generate" value="Generate" />
+                <input class="btn btn-info" type="submit" name="btn_generate" value="Tampilkan" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (TempData["generate"] != null)
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="card-title mb-3">
+                <h4>Tabel commit</h4>
+            </div>
+            <div class="mb-3 text-end">
+                <form asp-action="download">
+                    <input type="hidden" name="project_id" value="@TempData["generate_project_id"]" />
+                    <input type="hidden" name="tanggal_mulai" value="@TempData["generate_tanggal_mulai"]" />
+                    <input type="hidden" name="tanggal_selesai" value="@TempData["generate_tanggal_selesai"]" />
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-download" aria-hidden="true"></i> Download</button>
+                </form>
+            </div>
+            <table class="table table-hover table-striped" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.author_name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.message)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.committed_date)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.jam_mulai)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.jam_akhir)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.jumlah_jam)
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.author_name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.message)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.committed_date)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.jam_mulai)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.jam_akhir)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.jumlah_jam)
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+}
+
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $("#dataTable").DataTable();
+    </script>
+}
