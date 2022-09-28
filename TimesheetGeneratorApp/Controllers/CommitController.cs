@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using TimesheetGeneratorApp.Data;
 using TimesheetGeneratorApp.Models;
 using TimesheetGeneratorApp.Services;
@@ -238,9 +242,118 @@ namespace TimesheetGeneratorApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> download(GenerateCommitModel generateCommit)
+        {
+            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = await _context.CommitModel.ToListAsync();
+            var master_project = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(m => m.Id == generateCommit.project_id);
+            if (master_project == null)
+            {
+                return RedirectToAction();
+                TempData["error_system"] = "TIdak ada data yang akan dicetak";
+            }
+            if(data.Count() == 0)
+            {
+                TempData["error_system"] = "TIdak ada data yang akan dicetak";
+                return RedirectToAction("");
+            }
+            var stream = new MemoryStream();
+            using (var xlPackage = new ExcelPackage(stream))
+            {
+                Dictionary<String, CheckExportSheet> chk_export = new Dictionary<string, CheckExportSheet>();
+                foreach (var item in data) {
+                    if (chk_export.ContainsKey(item.author_name) == false)
+                    {
+                        //Todo : create new sheet
+                        var worksheet = xlPackage.Workbook.Worksheets.Add(item.author_name);
+                        worksheet.Cells["A1"].RichText.Add("Nama").Bold = true;
+                        worksheet.Cells["B1"].RichText.Add(item.author_name).Bold = true;
+                        this.create_template_table(worksheet);
+                        this.add_row_table(worksheet, 5, item);
+
+                        CheckExportSheet checkExportSheet = new CheckExportSheet();
+                        checkExportSheet.sheet = worksheet;
+                        checkExportSheet.lastRow = 5;
+                        chk_export[item.author_name] = checkExportSheet;
+                    }
+                    else
+                    {
+                        //Continue Avaible Sheet
+                        CheckExportSheet checkExportSheet = chk_export[item.author_name];
+                        var worksheet = checkExportSheet.sheet;
+                        var lastRow = checkExportSheet.lastRow + 1;
+
+                        this.add_row_table(worksheet, lastRow, item);
+                        checkExportSheet.lastRow = lastRow;
+                        chk_export[item.author_name] = checkExportSheet;
+                    }
+                }
+
+                //Todo : menerapkan border tabel
+                foreach (var item in chk_export.Values)
+                {
+                    ExcelWorksheet sheet = item.sheet;
+                    sheet.Cells["A4:E" + item.lastRow].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    sheet.Cells["A4:E" + item.lastRow].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    sheet.Cells["A4:E" + item.lastRow].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    sheet.Cells["A4:E" + item.lastRow].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    sheet.Cells["C4:E" + item.lastRow].Style
+                        .HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    sheet.Cells["A4:A" + item.lastRow].Style
+                        .HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    sheet.Cells["A4:E" + item.lastRow].Style.WrapText = true;
+                }
+
+                xlPackage.Save();
+                // Response.Clear();
+            }
+            stream.Position = 0;
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Timesheet "+ master_project.name+ ".xlsx");
+        }
+
+        //Todo : Membuat template tabel export excel
+        public void create_template_table(ExcelWorksheet sheet)
+        {
+            sheet.Cells["A" + 4].RichText.Add("Tanggal").Bold = true;
+            sheet.Cells["B" + 4].RichText.Add("Kegitan").Bold = true;
+            sheet.Cells["C" + 4].RichText.Add("Jam mulai").Bold = true;
+            sheet.Cells["D" + 4].RichText.Add("Jam Akhir").Bold = true;
+            sheet.Cells["E" + 4].RichText.Add("Jumlah Jam").Bold = true;
+
+            sheet.Cells["A4:E4"].Style
+                .HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            sheet.Column(1).Width = 14;
+            sheet.Column(2).Width = 100;
+            sheet.Column(3).Width = 14;
+            sheet.Column(4).Width = 13;
+            sheet.Column(5).Width = 13;
+
+            
+
+        }
+        //Todo : Menambah row excel
+        public void add_row_table(ExcelWorksheet sheet, int row, CommitModel model)
+        {
+            Regex pattern = new Regex("[\n]{2}");
+            
+
+            sheet.Cells["A" + row].Value = model.committed_date.ToString() ;
+            sheet.Cells["B" + row].Value = pattern.Replace(model.message, "\n");
+            sheet.Cells["C" + row].Value = "08.00";
+            sheet.Cells["D" + row].Value = "17.00";
+            sheet.Cells["E" + row].Value = "9";
+        }
+
         private bool CommitModelExists(int id)
         {
           return _context.CommitModel.Any(e => e.Id == id);
         }
     }
+
+    class CheckExportSheet
+    {
+        public int lastRow { set; get; }
+        public ExcelWorksheet sheet { set; get; }
+    }
+
 }
