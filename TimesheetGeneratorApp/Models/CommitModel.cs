@@ -9,6 +9,8 @@ namespace TimesheetGeneratorApp.Models
         public int Id { get; set; }
         [DisplayName("Nama author")]
         public string author_name { get; set; }
+        [DisplayName("Email author")]
+        public string author_email { get; set; }
         [DisplayName("Pesan")]
         public string message { get; set; }
         [DisplayName("Tanggal commit")]
