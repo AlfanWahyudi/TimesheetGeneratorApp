@@ -288,7 +288,7 @@ namespace TimesheetGeneratorApp.Controllers
                     if (chk_export.ContainsKey(item.author_name) == false)
                     {
                         //Todo : create new sheet
-                        var worksheet = xlPackage.Workbook.Worksheets.Add(item.author_name);
+                        var worksheet = xlPackage.Workbook.Worksheets.Add(ws_name);
                         worksheet.Cells["A1"].RichText.Add("Nama").Bold = true;
                         worksheet.Cells["B1"].RichText.Add(item.author_name).Bold = true;
                         this.create_template_table(worksheet);
@@ -387,8 +387,17 @@ namespace TimesheetGeneratorApp.Controllers
             Dictionary<string, int> row_date = new Dictionary<string, int>();
             int row_start = 5;
             for (var day = d_start; day.Date <= d_end.Date; day = day.AddDays(1)) {
+                string s_day = day.ToString("dddd");
                 sheet.Cells["A" + row_start].Value = day.ToString("dd-MMM-yyyy");
                 row_date.Add(day.ToString("dd-MMM-yyyy"), row_start);
+                
+                
+                if (s_day.ToLower().Equals("sabtu") || s_day.ToLower().Equals("minggu"))
+                {
+                    sheet.Cells["A" + row_start + ":E" + row_start].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    sheet.Cells["A" + row_start + ":E" + row_start].
+                        Style.Fill.BackgroundColor.SetColor(colFromHex);
+                }
                 row_start += 1;
             }
             return row_date;
