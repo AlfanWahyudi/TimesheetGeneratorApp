@@ -57,10 +57,8 @@ namespace TimesheetGeneratorApp.Controllers
                 return RedirectToAction("Index");
             }
 
-
             //TODO: Generate API data
             var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.Id == generateCommit.project_id);
-
             var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
                                                     masterProjectModel.project_id,
                                                     masterProjectModel.accsess_token, 
@@ -71,7 +69,10 @@ namespace TimesheetGeneratorApp.Controllers
 
             //TODO: Filter Date If Exist In DB
             var commitModelTanggalMulai = await _context.CommitModel
-                .FirstOrDefaultAsync(data => data.committed_date.Value.ToString().Contains(generateCommit.tanggal_mulai.ToString("yyy-MM-dd")));
+                .FirstOrDefaultAsync(data => 
+                    (data.committed_date.Value.ToString().Contains(generateCommit.tanggal_mulai.ToString("yyy-MM-dd")))
+                    && (data.MasterProjectModelId == masterProjectModel.Id)
+                );
            
             if (commitModelTanggalMulai != null)
             {
@@ -114,7 +115,6 @@ namespace TimesheetGeneratorApp.Controllers
 
             TempData["message_success"] = "Berhasil melakukan generate data";
             return RedirectToAction("");
-
         }
 
         
