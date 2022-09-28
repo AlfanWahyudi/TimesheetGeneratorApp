@@ -291,12 +291,12 @@ namespace TimesheetGeneratorApp.Controllers
             {
                 Dictionary<String, CheckExportSheet> chk_export = new Dictionary<string, CheckExportSheet>();
                 foreach (var item in data) {
-                    if (chk_export.ContainsKey(item.author_name) == false)
+                    if (chk_export.ContainsKey(item.author_email) == false)
                     {
                         //Todo : create new sheet
-                        var worksheet = xlPackage.Workbook.Worksheets.Add(item.author_name);
+                        var worksheet = xlPackage.Workbook.Worksheets.Add(item.author_email);
                         worksheet.Cells["A1"].RichText.Add("Nama").Bold = true;
-                        worksheet.Cells["B1"].RichText.Add(item.author_name).Bold = true;
+                        worksheet.Cells["B1"].RichText.Add(item.author_name +" - "+item.author_email).Bold = true;
                         this.create_template_table(worksheet);
                         
 
