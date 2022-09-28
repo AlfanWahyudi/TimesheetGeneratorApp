@@ -6,7 +6,7 @@ namespace TimesheetGeneratorApp.Models
 {
     public class MasterProjectModel
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         [DisplayName("Nama Project")]
         public string name { get; set; }
         [DisplayName("Project ID")]
@@ -21,5 +21,7 @@ namespace TimesheetGeneratorApp.Models
         public string? username { get; set; }
         [DisplayName("Password")]
         public string? password { get; set; }
+
+        public IEnumerable<CommitModel>? commits { get; set; }
     }
 }

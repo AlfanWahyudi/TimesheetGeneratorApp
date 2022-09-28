@@ -26,7 +26,7 @@ namespace TimesheetGeneratorApp.Controllers
 
             _context_mp = context_mp;
             _httpClient = new HttpClient();
-            _gitlabService = new GitlabService(_httpClient);
+            _gitlabService = new GitlabService(_httpClient, this);
             parameterModel = new ParameterModel();
         }
 
@@ -55,7 +55,7 @@ namespace TimesheetGeneratorApp.Controllers
 
 
             //TODO: Generate API data
-            var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.id == generateCommit.project_id);
+            var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.Id == generateCommit.project_id);
 
             var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
                                                     masterProjectModel.project_id,
@@ -63,6 +63,11 @@ namespace TimesheetGeneratorApp.Controllers
                                                     generateCommit.tanggal_mulai.ToString(),
                                                     generateCommit.tanggal_selesai.ToString(),
                                                     "true", "true", "100");
+            //Todo : check error system
+            if(gitlabData == null)
+            {
+                return RedirectToAction("");
+            }
 
             //TODO: Save Data Gitlab API to DB
             foreach (GitlabCommitModel item in gitlabData)
@@ -77,6 +82,7 @@ namespace TimesheetGeneratorApp.Controllers
                 cm.jam_akhir = item.committed_date;
                 //cm.jam_akhir = "17:00";
                 cm.author_name = item.author_name;
+                cm.MasterProjectModelId = generateCommit.project_id;
 
                 _context.CommitModel.Add(cm);
                 _context.SaveChanges();
@@ -101,9 +107,8 @@ namespace TimesheetGeneratorApp.Controllers
 
             }
 
-            return Ok(
-                new { Results = gitlabData }
-            );
+            TempData["message_success"] = "Berhasil melakukan generate data";
+            return RedirectToAction("");
 
         }
 

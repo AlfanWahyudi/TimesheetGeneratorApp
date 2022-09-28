@@ -363,3 +363,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+TimesheetGeneratorApp/obj/staticwebassets.pack.sentinel
+TimesheetGeneratorApp/obj/Debug/net6.0/TimesheetGeneratorApp.pdb
+TimesheetGeneratorApp/obj/Debug/net6.0/TimesheetGeneratorApp.GeneratedMSBuildEditorConfig.editorconfig
+TimesheetGeneratorApp/obj/Debug/net6.0/TimesheetGeneratorApp.dll
+TimesheetGeneratorApp/obj/Debug/net6.0/refint/TimesheetGeneratorApp.dll
+TimesheetGeneratorApp/obj/Debug/net6.0/ref/TimesheetGeneratorApp.dll
+TimesheetGeneratorApp/bin/Debug/net6.0/TimesheetGeneratorApp.pdb
+TimesheetGeneratorApp/bin/Debug/net6.0/TimesheetGeneratorApp.dll
+.vs/TimesheetGeneratorApp/v17/.suo

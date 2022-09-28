@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TimesheetGeneratorApp.Models
 {
@@ -18,5 +20,9 @@ namespace TimesheetGeneratorApp.Models
         [DisplayName("Jumlah jam")]
         public int? jumlah_jam { get; set; }
 
+        [ForeignKey("MasterProjectModel")]
+        public int MasterProjectModelId { get; set; }
+
+        public MasterProjectModel? MasterProjectModel { get; set; }
     }
 }
