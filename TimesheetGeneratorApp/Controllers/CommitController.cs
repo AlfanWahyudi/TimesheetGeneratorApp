@@ -30,7 +30,7 @@ namespace TimesheetGeneratorApp.Controllers
         {
             _context = context;
             _context_mp = context_mp;
-            
+
             _httpClient = new HttpClient();
             _gitlabService = new GitlabService(_httpClient, this);
 
@@ -41,17 +41,19 @@ namespace TimesheetGeneratorApp.Controllers
         public async Task<IActionResult> Index()
         {
             ViewBag.mp = await _context_mp.MasterProjectModel.ToListAsync();
-            if(TempData["generate"] == null)
+            if (TempData["generate"] == null)
             {
                 return View(await _context.CommitModel.ToListAsync());
-            }else{
+            }
+            else
+            {
                 DateTime tgl_mulai = ((DateTime)TempData["generate_tanggal_mulai"]);
                 DateTime tgl_selesai = ((DateTime)TempData["generate_tanggal_selesai"]);
 
                 TempData["generate_tanggal_mulai"] = tgl_mulai.ToString("yyyy-MM-dd");
                 TempData["generate_tanggal_selesai"] = tgl_selesai.ToString("yyyy-MM-dd");
                 ;
-                IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = 
+                IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data =
                     await _context.CommitModel
                     .Where(m => m.MasterProjectModelId == (int)TempData["generate_project_id"])
                     .Where(m => m.committed_date >= new DateTime(tgl_mulai.Year, tgl_mulai.Month, tgl_mulai.Day, 0, 0, 0))
@@ -61,15 +63,16 @@ namespace TimesheetGeneratorApp.Controllers
                     .ToListAsync();
                 return View(data);
             }
-        }        
+        }
         public async Task<IActionResult> generate(GenerateCommitModel generateCommit)
         {
+            TempData["generate"] = true;
+            TempData["generate_tanggal_mulai"] = generateCommit.tanggal_mulai;
+            TempData["generate_tanggal_selesai"] = generateCommit.tanggal_selesai;
+            TempData["generate_project_id"] = generateCommit.project_id;
+
             if (generateCommit.btn_generate.Equals("Tampilkan"))
             {
-                TempData["generate"] = true;
-                TempData["generate_tanggal_mulai"] = generateCommit.tanggal_mulai;
-                TempData["generate_tanggal_selesai"] = generateCommit.tanggal_selesai;
-                TempData["generate_project_id"] = generateCommit.project_id;
                 return RedirectToAction("Index");
             }
 
@@ -77,11 +80,11 @@ namespace TimesheetGeneratorApp.Controllers
 
             //TODO: Filter Date If Exist In DB
             var commitModelTanggalMulai = await _context.CommitModel
-                .FirstOrDefaultAsync(data => 
+                .FirstOrDefaultAsync(data =>
                     (data.committed_date.Value.ToString().Contains(generateCommit.tanggal_mulai.ToString("yyy-MM-dd")))
                     && (data.MasterProjectModelId == masterProjectModel.Id)
                 );
-           
+
             if (commitModelTanggalMulai != null)
             {
                 TempData["error_system"] = "Tanggal mulai yang dimasukkan telah tersedia di database";
@@ -124,7 +127,7 @@ namespace TimesheetGeneratorApp.Controllers
             return RedirectToAction("");
         }
 
-        
+
         // GET: Commit/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -248,7 +251,7 @@ namespace TimesheetGeneratorApp.Controllers
             {
                 _context.CommitModel.Remove(commitModel);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -261,7 +264,7 @@ namespace TimesheetGeneratorApp.Controllers
             tgl_mulai = new DateTime(tgl_mulai.Year, tgl_mulai.Month, tgl_mulai.Day, 0, 0, 0);
             tgl_selesai = new DateTime(tgl_selesai.Year, tgl_selesai.Month, tgl_selesai.Day, 23, 59, 59);
 
-            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = 
+            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data =
                 await _context.CommitModel
                 .OrderBy(m => m.committed_date)
                 .Where(m => m.MasterProjectModelId == generateCommit.project_id)
@@ -275,7 +278,7 @@ namespace TimesheetGeneratorApp.Controllers
                 return RedirectToAction();
                 TempData["error_system"] = "TIdak ada data yang akan dicetak";
             }
-            if(data.Count() == 0)
+            if (data.Count() == 0)
             {
                 TempData["error_system"] = "TIdak ada data yang akan dicetak";
                 return RedirectToAction("");
@@ -284,33 +287,36 @@ namespace TimesheetGeneratorApp.Controllers
             using (var xlPackage = new ExcelPackage(stream))
             {
                 Dictionary<String, CheckExportSheet> chk_export = new Dictionary<string, CheckExportSheet>();
-                foreach (var item in data) {
-                    if (chk_export.ContainsKey(item.author_name) == false)
+                foreach (var item in data)
+                {
+                    string ws_name = item.author_email.Replace("@", "_");
+                    ws_name = ws_name.Replace(".", "_");
+                    if (chk_export.ContainsKey(ws_name) == false)
                     {
                         //Todo : create new sheet
-                        var worksheet = xlPackage.Workbook.Worksheets.Add(ws_name);
+                        var worksheet = xlPackage.Workbook.Worksheets.Add(item.author_name);
                         worksheet.Cells["A1"].RichText.Add("Nama").Bold = true;
-                        worksheet.Cells["B1"].RichText.Add(item.author_name).Bold = true;
+                        worksheet.Cells["B1"].RichText.Add(item.author_name + " - " + item.author_email).Bold = true;
                         this.create_template_table(worksheet);
-                        
+
 
                         CheckExportSheet checkExportSheet = new CheckExportSheet();
                         String d_string = ((DateTime)item.committed_date).ToString("dd-MMM-yyyy");
-                        checkExportSheet.row_date =  this.init_row_date(worksheet, tgl_mulai, tgl_selesai);
+                        checkExportSheet.row_date = this.init_row_date(worksheet, tgl_mulai, tgl_selesai);
                         checkExportSheet.sheet = worksheet;
                         checkExportSheet.ck_date = d_string;
                         checkExportSheet.currentRow = checkExportSheet.row_date[d_string];
                         checkExportSheet.lastRow = checkExportSheet.row_date[tgl_selesai.ToString("dd-MMM-yyyy")];
-                        chk_export[item.author_name] = checkExportSheet;
+                        chk_export[ws_name] = checkExportSheet;
 
                         this.add_row_table(worksheet, checkExportSheet.currentRow, item, true);
                     }
                     else
                     {
                         //Continue Avaible Sheet
-                        CheckExportSheet checkExportSheet = chk_export[item.author_name];
+                        CheckExportSheet checkExportSheet = chk_export[ws_name];
                         var worksheet = checkExportSheet.sheet;
-                        
+
 
                         bool add_row = true;
                         string commit_date = ((DateTime)item.committed_date).ToString("dd-MMM-yyyy");
@@ -330,7 +336,7 @@ namespace TimesheetGeneratorApp.Controllers
                         this.add_row_table(worksheet, current, item, add_row);
                         checkExportSheet.currentRow = current;
                         checkExportSheet.ck_date = commit_date;
-                        chk_export[item.author_name] = checkExportSheet;
+                        chk_export[ws_name] = checkExportSheet;
 
                     }
                 }
@@ -360,14 +366,14 @@ namespace TimesheetGeneratorApp.Controllers
                 // Response.Clear();
             }
             stream.Position = 0;
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Timesheet "+ master_project.name+ ".xlsx");
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Timesheet " + master_project.name + ".xlsx");
         }
 
         //Todo : Membuat template tabel export excel
         public void create_template_table(ExcelWorksheet sheet)
         {
             sheet.Cells["A" + 4].RichText.Add("Tanggal").Bold = true;
-            sheet.Cells["B" + 4].RichText.Add("Kegitan").Bold = true;
+            sheet.Cells["B" + 4].RichText.Add("Kegiatan").Bold = true;
             sheet.Cells["C" + 4].RichText.Add("Jam mulai").Bold = true;
             sheet.Cells["D" + 4].RichText.Add("Jam Akhir").Bold = true;
             sheet.Cells["E" + 4].RichText.Add("Jumlah Jam").Bold = true;
@@ -383,22 +389,27 @@ namespace TimesheetGeneratorApp.Controllers
 
         }
         //TODO : membuat inisialisasi row tanggal pada excel kemudian mengembalikan index row pada masing-masing tanggal
-        Dictionary<string, int> init_row_date(ExcelWorksheet sheet, DateTime d_start, DateTime d_end) {
+        Dictionary<string, int> init_row_date(ExcelWorksheet sheet, DateTime d_start, DateTime d_end)
+        {
+            Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#ffc8dd");
             Dictionary<string, int> row_date = new Dictionary<string, int>();
+
             int row_start = 5;
-            for (var day = d_start; day.Date <= d_end.Date; day = day.AddDays(1)) {
+            var day = d_start;
+            while (day.Date <= d_end.Date)
+            {
                 string s_day = day.ToString("dddd");
                 sheet.Cells["A" + row_start].Value = day.ToString("dd-MMM-yyyy");
                 row_date.Add(day.ToString("dd-MMM-yyyy"), row_start);
-                
-                
-                if (s_day.ToLower().Equals("sabtu") || s_day.ToLower().Equals("minggu"))
+
+                if (s_day.ToLower().Equals("saturday") || s_day.ToLower().Equals("sunday"))
                 {
                     sheet.Cells["A" + row_start + ":E" + row_start].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     sheet.Cells["A" + row_start + ":E" + row_start].
                         Style.Fill.BackgroundColor.SetColor(colFromHex);
                 }
                 row_start += 1;
+                day = day.AddDays(1);
             }
             return row_date;
         }
@@ -412,7 +423,7 @@ namespace TimesheetGeneratorApp.Controllers
             message = pattern_last_newline.Replace(message, "");
             if (add_row == true)
             {
-                
+
                 string d = ((DateTime)model.committed_date).ToString("dd-MMM-yyyy");
                 sheet.Cells["A" + row].Value = d;
                 sheet.Cells["B" + row].Value = message;
@@ -429,7 +440,7 @@ namespace TimesheetGeneratorApp.Controllers
 
         private bool CommitModelExists(int id)
         {
-          return _context.CommitModel.Any(e => e.Id == id);
+            return _context.CommitModel.Any(e => e.Id == id);
         }
     }
 
