@@ -12,7 +12,8 @@ builder.Services.AddDbContext<MasterProjectContext>(options =>
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
-
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
