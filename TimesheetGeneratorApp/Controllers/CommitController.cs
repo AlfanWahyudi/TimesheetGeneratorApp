@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -47,6 +48,8 @@ namespace TimesheetGeneratorApp.Controllers
                 DateTime tgl_mulai = ((DateTime)TempData["generate_tanggal_mulai"]);
                 DateTime tgl_selesai = ((DateTime)TempData["generate_tanggal_selesai"]);
 
+                TempData["generate_tanggal_mulai"] = tgl_mulai.ToString("yyyy-MM-dd");
+                TempData["generate_tanggal_selesai"] = tgl_selesai.ToString("yyyy-MM-dd");
                 ;
                 IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = 
                     await _context.CommitModel
@@ -255,12 +258,15 @@ namespace TimesheetGeneratorApp.Controllers
             DateTime tgl_mulai = generateCommit.tanggal_mulai;
             DateTime tgl_selesai = generateCommit.tanggal_selesai;
 
+            tgl_mulai = new DateTime(tgl_mulai.Year, tgl_mulai.Month, tgl_mulai.Day, 0, 0, 0);
+            tgl_selesai = new DateTime(tgl_selesai.Year, tgl_selesai.Month, tgl_selesai.Day, 23, 59, 59);
+
             IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = 
                 await _context.CommitModel
                 .OrderBy(m => m.committed_date)
                 .Where(m => m.MasterProjectModelId == generateCommit.project_id)
-                .Where(m => m.committed_date >= new DateTime(tgl_mulai.Year, tgl_mulai.Month, tgl_mulai.Day, 0, 0, 0))
-                .Where(m => m.committed_date <= new DateTime(tgl_selesai.Year, tgl_selesai.Month, tgl_selesai.Day, 23, 59, 59))
+                .Where(m => m.committed_date >= tgl_mulai)
+                .Where(m => m.committed_date <= tgl_selesai)
                 .ToListAsync();
 
             var master_project = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(m => m.Id == generateCommit.project_id);
@@ -286,37 +292,43 @@ namespace TimesheetGeneratorApp.Controllers
                         worksheet.Cells["A1"].RichText.Add("Nama").Bold = true;
                         worksheet.Cells["B1"].RichText.Add(item.author_name).Bold = true;
                         this.create_template_table(worksheet);
-                        this.add_row_table(worksheet, 5, item, true);
+                        
 
                         CheckExportSheet checkExportSheet = new CheckExportSheet();
+                        String d_string = ((DateTime)item.committed_date).ToString("dd-MMM-yyyy");
+                        checkExportSheet.row_date =  this.init_row_date(worksheet, tgl_mulai, tgl_selesai);
                         checkExportSheet.sheet = worksheet;
-                        checkExportSheet.lastRow = 5;
-                        checkExportSheet.ck_date = ((DateTime)item.committed_date).ToString("dd-MMM-yyyy");
+                        checkExportSheet.ck_date = d_string;
+                        checkExportSheet.currentRow = checkExportSheet.row_date[d_string];
+                        checkExportSheet.lastRow = checkExportSheet.row_date[tgl_selesai.ToString("dd-MMM-yyyy")];
                         chk_export[item.author_name] = checkExportSheet;
+
+                        this.add_row_table(worksheet, checkExportSheet.currentRow, item, true);
                     }
                     else
                     {
                         //Continue Avaible Sheet
                         CheckExportSheet checkExportSheet = chk_export[item.author_name];
                         var worksheet = checkExportSheet.sheet;
-                        var lastRow = checkExportSheet.lastRow;
+                        
 
                         bool add_row = true;
                         string commit_date = ((DateTime)item.committed_date).ToString("dd-MMM-yyyy");
-                        if (checkExportSheet.ck_date == null) {
-                            lastRow += 1;
-                        }
-                        else
-                        {
-                            if (checkExportSheet.ck_date.Equals(commit_date))
-                                add_row = false;
-                            else
-                                lastRow += 1;
-                        }
-                        
+                        var current = checkExportSheet.row_date[commit_date];
+                        //if (checkExportSheet.ck_date == null) {
+                        //    lastRow += 1;
+                        //}
+                        //else
+                        //{
+                        if (checkExportSheet.ck_date.Equals(commit_date))
+                            add_row = false;
+                        //    else
+                        //        lastRow += 1;
+                        //}
 
-                        this.add_row_table(worksheet, lastRow, item, add_row);
-                        checkExportSheet.lastRow = lastRow;
+
+                        this.add_row_table(worksheet, current, item, add_row);
+                        checkExportSheet.currentRow = current;
                         checkExportSheet.ck_date = commit_date;
                         chk_export[item.author_name] = checkExportSheet;
 
@@ -369,8 +381,17 @@ namespace TimesheetGeneratorApp.Controllers
             sheet.Column(4).Width = 13;
             sheet.Column(5).Width = 13;
 
-            
-
+        }
+        //TODO : membuat inisialisasi row tanggal pada excel kemudian mengembalikan index row pada masing-masing tanggal
+        Dictionary<string, int> init_row_date(ExcelWorksheet sheet, DateTime d_start, DateTime d_end) {
+            Dictionary<string, int> row_date = new Dictionary<string, int>();
+            int row_start = 5;
+            for (var day = d_start; day.Date <= d_end.Date; day = day.AddDays(1)) {
+                sheet.Cells["A" + row_start].Value = day.ToString("dd-MMM-yyyy");
+                row_date.Add(day.ToString("dd-MMM-yyyy"), row_start);
+                row_start += 1;
+            }
+            return row_date;
         }
         //Todo : Menambah row excel
         public void add_row_table(ExcelWorksheet sheet, int row, CommitModel model, bool add_row)
@@ -405,9 +426,11 @@ namespace TimesheetGeneratorApp.Controllers
 
     class CheckExportSheet
     {
+        public int currentRow { set; get; }
         public int lastRow { set; get; }
         public ExcelWorksheet sheet { set; get; }
         public string ck_date { set; get; }
+        public Dictionary<string, int> row_date;
     }
 
 }

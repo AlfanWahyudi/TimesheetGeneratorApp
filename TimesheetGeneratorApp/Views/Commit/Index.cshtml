@@ -29,14 +29,14 @@
                 <div class="mb-3 col-md-6 col-12">
                     <div class="form-group mb-3">
                         <label class="form-label">Tanggal mulai</label>
-                        <input type="date" class="form-control" name="tanggal_mulai" required/>
+                        <input type="date" class="form-control" name="tanggal_mulai" value="@TempData["generate_tanggal_mulai"]" required/>
                     </div>
                 </div>          
 
                 <div class="mb-3 col-md-6 col-12">
                     <div class="form-group mb-3">
                         <label class="form-label">Tanggal selesai</label>
-                        <input type="date" class="form-control" name="tanggal_selesai" required/>
+                        <input type="date" class="form-control" name="tanggal_selesai" value="@TempData["generate_tanggal_selesai"]" required/>
                     </div>
                 </div>
             </div>
