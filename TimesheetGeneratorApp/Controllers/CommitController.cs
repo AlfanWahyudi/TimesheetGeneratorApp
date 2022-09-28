@@ -22,15 +22,17 @@ namespace TimesheetGeneratorApp.Controllers
 
         private HttpClient _httpClient;
         private GitlabService _gitlabService;
+
         private ParameterModel parameterModel;
 
         public CommitController(CommitContext context, MasterProjectContext context_mp)
         {
             _context = context;
-
             _context_mp = context_mp;
+            
             _httpClient = new HttpClient();
             _gitlabService = new GitlabService(_httpClient, this);
+
             parameterModel = new ParameterModel();
         }
 
@@ -68,8 +70,6 @@ namespace TimesheetGeneratorApp.Controllers
                 return RedirectToAction("Index");
             }
 
-
-
             var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.Id == generateCommit.project_id);
 
             //TODO: Filter Date If Exist In DB
@@ -85,15 +85,6 @@ namespace TimesheetGeneratorApp.Controllers
 
                 return RedirectToAction("");
             }
-
-            //TODO: Dont Save Data If Exist In DB
-            //Get data in Table CommitModel
-
-            //Check data message dari API === message dari DB
-
-            //IF Same Dont Save
-
-            //If Not Same Just Save
 
             //TODO: Generate API data
             var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
@@ -119,6 +110,7 @@ namespace TimesheetGeneratorApp.Controllers
                 cm.jam_mulai = "08:00";
                 cm.jam_akhir = "17:00";
                 cm.author_name = item.author_name;
+                cm.author_email = item.author_email;
                 cm.MasterProjectModelId = masterProjectModel.Id;
 
                 _context.CommitModel.Add(cm);
