@@ -73,38 +73,16 @@ namespace TimesheetGeneratorApp.Controllers
             foreach (GitlabCommitModel item in gitlabData)
             {
                 CommitModel cm = new CommitModel();
-                cm.message = item.message;
-                //cm.committed_date = item.committed_date?.ToString("d-MMM-yyyy") ?? "N/A";
+                cm.message = item.message.Trim();
                 cm.committed_date = item.committed_date;
-                cm.jumlah_jam = 8;
-                cm.jam_mulai = new DateTime(2019, 11, 12, 8, 0, 0);
-                //cm.jam_mulai = "08:00";
-                cm.jam_akhir = new DateTime(2019, 11, 12, 17, 0, 0);
-                //cm.jam_akhir = "17:00";
+                cm.jumlah_jam = 9;
+                cm.jam_mulai = "08:00";
+                cm.jam_akhir = "17:00";
                 cm.author_name = item.author_name;
                 cm.MasterProjectModelId = masterProjectModel.Id;
 
                 _context.CommitModel.Add(cm);
                 _context.SaveChanges();
-
-                //return Ok(
-                //    new { Results = gitlabData }
-                //);
-
-
-                //foreach (var item in obj)
-                //{
-                //    CommitModel cm = new CommitModel();
-                //    cm.message = item.message;
-                //    cm.committed_date = item.committed_date;
-                //    cm.jumlah_jam = 8;
-                //    cm.jam_mulai = item.committed_date;
-                //    cm.jam_akhir = item.committed_date;
-                //    cm.author_name = item.author_name;
-
-                //    _context.CommitModel.Add(cm);
-                //}
-
             }
 
             TempData["message_success"] = "Berhasil melakukan generate data";

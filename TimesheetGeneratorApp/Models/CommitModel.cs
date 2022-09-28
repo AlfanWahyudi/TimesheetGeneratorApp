@@ -14,9 +14,9 @@ namespace TimesheetGeneratorApp.Models
         [DisplayName("Tanggal commit")]
         public DateTime? committed_date { get; set; }
         [DisplayName("Jam mulai")]
-        public DateTime? jam_mulai { get; set; }
+        public string jam_mulai { get; set; }
         [DisplayName("Jam aKhir")]
-        public DateTime? jam_akhir { get; set; }
+        public string jam_akhir { get; set; }
         [DisplayName("Jumlah jam")]
         public int? jumlah_jam { get; set; }
 
