@@ -45,7 +45,7 @@ namespace TimesheetGeneratorApp.Controllers
                 IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = await _context.CommitModel.ToListAsync();
                 return View(data);
             }
-        }
+        }        
         public async Task<IActionResult> generate(GenerateCommitModel generateCommit)
         {
             if (generateCommit.btn_generate.Equals("Tampilkan"))
@@ -67,8 +67,31 @@ namespace TimesheetGeneratorApp.Controllers
                                                     generateCommit.tanggal_mulai.ToString(),
                                                     generateCommit.tanggal_selesai.ToString(),
                                                     "true", "true", "100");
+
+
+            //TODO: Filter Date If Exist In DB
+            var commitModelTanggalMulai = await _context.CommitModel
+                .FirstOrDefaultAsync(data => data.committed_date.Value.ToString().Contains(generateCommit.tanggal_mulai.ToString("yyy-MM-dd")));
+           
+            if (commitModelTanggalMulai != null)
+            {
+                TempData["error_system"] = "Tanggal mulai yang dimasukkan telah tersedia di database";
+
+                return RedirectToAction("");
+            }
+
+            //TODO: Dont Save Data If Exist In DB
+            //Get data in Table CommitModel
+
+            //Check data message dari API === message dari DB
+
+            //IF Same Dont Save
+
+            //If Not Same Just Save
+
+
             //Todo : check error system
-            if(gitlabData == null)
+            if (gitlabData == null)
             {
                 return RedirectToAction("");
             }
