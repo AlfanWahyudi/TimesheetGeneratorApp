@@ -56,7 +56,7 @@ namespace TimesheetGeneratorApp.Controllers
                     .ToListAsync();
                 return View(data);
             }
-        }
+        }        
         public async Task<IActionResult> generate(GenerateCommitModel generateCommit)
         {
             if (generateCommit.btn_generate.Equals("Tampilkan"))
@@ -68,15 +68,9 @@ namespace TimesheetGeneratorApp.Controllers
                 return RedirectToAction("Index");
             }
 
-            //TODO: Generate API data
-            var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.Id == generateCommit.project_id);
-            var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
-                                                    masterProjectModel.project_id,
-                                                    masterProjectModel.accsess_token, 
-                                                    generateCommit.tanggal_mulai.ToString(),
-                                                    generateCommit.tanggal_selesai.ToString(),
-                                                    "true", "true", "100");
 
+
+            var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.Id == generateCommit.project_id);
 
             //TODO: Filter Date If Exist In DB
             var commitModelTanggalMulai = await _context.CommitModel
@@ -101,6 +95,13 @@ namespace TimesheetGeneratorApp.Controllers
 
             //If Not Same Just Save
 
+            //TODO: Generate API data
+            var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
+                                                    masterProjectModel.project_id,
+                                                    masterProjectModel.accsess_token,
+                                                    generateCommit.tanggal_mulai.ToString(),
+                                                    generateCommit.tanggal_selesai.ToString(),
+                                                    "true", "true", "100");
 
             //Todo : check error system
             if (gitlabData == null)
@@ -126,7 +127,6 @@ namespace TimesheetGeneratorApp.Controllers
 
             TempData["message_success"] = "Berhasil melakukan generate data";
             return RedirectToAction("");
-
         }
 
         
