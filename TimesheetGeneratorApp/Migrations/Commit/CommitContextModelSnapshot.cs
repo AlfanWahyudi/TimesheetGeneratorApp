@@ -30,6 +30,9 @@ namespace TimesheetGeneratorApp.Migrations.Commit
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("MasterProjectModelId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("author_name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -37,11 +40,13 @@ namespace TimesheetGeneratorApp.Migrations.Commit
                     b.Property<DateTime?>("committed_date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("jam_akhir")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("jam_akhir")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<DateTime?>("jam_mulai")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("jam_mulai")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("jumlah_jam")
                         .HasColumnType("integer");
@@ -52,7 +57,63 @@ namespace TimesheetGeneratorApp.Migrations.Commit
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MasterProjectModelId");
+
                     b.ToTable("CommitModel");
+                });
+
+            modelBuilder.Entity("TimesheetGeneratorApp.Models.MasterProjectModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("accsess_token")
+                        .HasColumnType("text");
+
+                    b.Property<string>("host_url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("password")
+                        .HasColumnType("text");
+
+                    b.Property<string>("project_id")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("username")
+                        .HasColumnType("text");
+
+                    b.Property<string>("version_control")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MasterProjectModel");
+                });
+
+            modelBuilder.Entity("TimesheetGeneratorApp.Models.CommitModel", b =>
+                {
+                    b.HasOne("TimesheetGeneratorApp.Models.MasterProjectModel", "MasterProjectModel")
+                        .WithMany("commits")
+                        .HasForeignKey("MasterProjectModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MasterProjectModel");
+                });
+
+            modelBuilder.Entity("TimesheetGeneratorApp.Models.MasterProjectModel", b =>
+                {
+                    b.Navigation("commits");
                 });
 #pragma warning restore 612, 618
         }

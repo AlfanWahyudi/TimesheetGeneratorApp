@@ -2,18 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TimesheetGeneratorApp.Data;
 
 #nullable disable
 
-namespace TimesheetGeneratorApp.Migrations
+namespace TimesheetGeneratorApp.Migrations.Commit
 {
-    [DbContext(typeof(MasterProjectContext))]
-    partial class MasterProjectContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(CommitContext))]
+    [Migration("20220928032307_ChangeDataTypeInTableCommitModel")]
+    partial class ChangeDataTypeInTableCommitModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,11 +42,13 @@ namespace TimesheetGeneratorApp.Migrations
                     b.Property<DateTime?>("committed_date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("jam_akhir")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("jam_akhir")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<DateTime?>("jam_mulai")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("jam_mulai")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("jumlah_jam")
                         .HasColumnType("integer");

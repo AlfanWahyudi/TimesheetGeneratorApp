@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TimesheetGeneratorApp.Data;
@@ -11,9 +12,10 @@ using TimesheetGeneratorApp.Data;
 namespace TimesheetGeneratorApp.Migrations
 {
     [DbContext(typeof(MasterProjectContext))]
-    partial class MasterProjectContextModelSnapshot : ModelSnapshot
+    [Migration("20220928030620_AddRelationToCommitModel")]
+    partial class AddRelationToCommitModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

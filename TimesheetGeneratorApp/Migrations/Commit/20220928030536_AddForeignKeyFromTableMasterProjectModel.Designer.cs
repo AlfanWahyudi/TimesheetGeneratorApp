@@ -2,18 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TimesheetGeneratorApp.Data;
 
 #nullable disable
 
-namespace TimesheetGeneratorApp.Migrations
+namespace TimesheetGeneratorApp.Migrations.Commit
 {
-    [DbContext(typeof(MasterProjectContext))]
-    partial class MasterProjectContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(CommitContext))]
+    [Migration("20220928030536_AddForeignKeyFromTableMasterProjectModel")]
+    partial class AddForeignKeyFromTableMasterProjectModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
