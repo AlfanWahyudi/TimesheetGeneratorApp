@@ -42,7 +42,18 @@ namespace TimesheetGeneratorApp.Controllers
             {
                 return View(await _context.CommitModel.ToListAsync());
             }else{
-                IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = await _context.CommitModel.ToListAsync();
+                DateTime tgl_mulai = ((DateTime)TempData["generate_tanggal_mulai"]);
+                DateTime tgl_selesai = ((DateTime)TempData["generate_tanggal_selesai"]);
+
+                ;
+                IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = 
+                    await _context.CommitModel
+                    .Where(m => m.MasterProjectModelId == (int)TempData["generate_project_id"])
+                    .Where(m => m.committed_date >= new DateTime(tgl_mulai.Year, tgl_mulai.Month, tgl_mulai.Day, 0, 0, 0))
+                    .Where(m => m.committed_date <= new DateTime(tgl_selesai.Year, tgl_selesai.Month, tgl_selesai.Day, 23, 59, 59))
+                    .OrderBy(m => m.author_name)
+                    .ThenBy(m => m.committed_date)
+                    .ToListAsync();
                 return View(data);
             }
         }
@@ -225,7 +236,17 @@ namespace TimesheetGeneratorApp.Controllers
 
         public async Task<IActionResult> download(GenerateCommitModel generateCommit)
         {
-            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = await _context.CommitModel.ToListAsync();
+            DateTime tgl_mulai = generateCommit.tanggal_mulai;
+            DateTime tgl_selesai = generateCommit.tanggal_selesai;
+
+            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data = 
+                await _context.CommitModel
+                .OrderBy(m => m.committed_date)
+                .Where(m => m.MasterProjectModelId == generateCommit.project_id)
+                .Where(m => m.committed_date >= new DateTime(tgl_mulai.Year, tgl_mulai.Month, tgl_mulai.Day, 0, 0, 0))
+                .Where(m => m.committed_date <= new DateTime(tgl_selesai.Year, tgl_selesai.Month, tgl_selesai.Day, 23, 59, 59))
+                .ToListAsync();
+
             var master_project = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(m => m.Id == generateCommit.project_id);
             if (master_project == null)
             {
@@ -249,11 +270,12 @@ namespace TimesheetGeneratorApp.Controllers
                         worksheet.Cells["A1"].RichText.Add("Nama").Bold = true;
                         worksheet.Cells["B1"].RichText.Add(item.author_name).Bold = true;
                         this.create_template_table(worksheet);
-                        this.add_row_table(worksheet, 5, item);
+                        this.add_row_table(worksheet, 5, item, true);
 
                         CheckExportSheet checkExportSheet = new CheckExportSheet();
                         checkExportSheet.sheet = worksheet;
                         checkExportSheet.lastRow = 5;
+                        checkExportSheet.ck_date = ((DateTime)item.committed_date).ToString("dd-MMM-yyyy");
                         chk_export[item.author_name] = checkExportSheet;
                     }
                     else
@@ -261,11 +283,27 @@ namespace TimesheetGeneratorApp.Controllers
                         //Continue Avaible Sheet
                         CheckExportSheet checkExportSheet = chk_export[item.author_name];
                         var worksheet = checkExportSheet.sheet;
-                        var lastRow = checkExportSheet.lastRow + 1;
+                        var lastRow = checkExportSheet.lastRow;
 
-                        this.add_row_table(worksheet, lastRow, item);
+                        bool add_row = true;
+                        string commit_date = ((DateTime)item.committed_date).ToString("dd-MMM-yyyy");
+                        if (checkExportSheet.ck_date == null) {
+                            lastRow += 1;
+                        }
+                        else
+                        {
+                            if (checkExportSheet.ck_date.Equals(commit_date))
+                                add_row = false;
+                            else
+                                lastRow += 1;
+                        }
+                        
+
+                        this.add_row_table(worksheet, lastRow, item, add_row);
                         checkExportSheet.lastRow = lastRow;
+                        checkExportSheet.ck_date = commit_date;
                         chk_export[item.author_name] = checkExportSheet;
+
                     }
                 }
 
@@ -281,6 +319,12 @@ namespace TimesheetGeneratorApp.Controllers
                         .HorizontalAlignment = ExcelHorizontalAlignment.Center;
                     sheet.Cells["A4:A" + item.lastRow].Style
                         .HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    sheet.Cells["A4:E" + item.lastRow].Style.WrapText = true;
+
+                    sheet.Cells["C4:E" + item.lastRow].Style
+                        .VerticalAlignment = ExcelVerticalAlignment.Top;
+                    sheet.Cells["A4:A" + item.lastRow].Style
+                        .VerticalAlignment = ExcelVerticalAlignment.Top;
                     sheet.Cells["A4:E" + item.lastRow].Style.WrapText = true;
                 }
 
@@ -313,16 +357,28 @@ namespace TimesheetGeneratorApp.Controllers
 
         }
         //Todo : Menambah row excel
-        public void add_row_table(ExcelWorksheet sheet, int row, CommitModel model)
+        public void add_row_table(ExcelWorksheet sheet, int row, CommitModel model, bool add_row)
         {
             Regex pattern = new Regex("[\n]{2}");
-            
+            Regex pattern_last_newline = new Regex("[.+\n]$");
 
-            sheet.Cells["A" + row].Value = model.committed_date.ToString() ;
-            sheet.Cells["B" + row].Value = pattern.Replace(model.message, "\n");
-            sheet.Cells["C" + row].Value = "08.00";
-            sheet.Cells["D" + row].Value = "17.00";
-            sheet.Cells["E" + row].Value = "9";
+            string message = pattern.Replace(model.message, "\n");
+            message = pattern_last_newline.Replace(message, "");
+            if (add_row == true)
+            {
+                
+                string d = ((DateTime)model.committed_date).ToString("dd-MMM-yyyy");
+                sheet.Cells["A" + row].Value = d;
+                sheet.Cells["B" + row].Value = message;
+                sheet.Cells["C" + row].Value = model.jam_mulai;
+                sheet.Cells["D" + row].Value = model.jam_akhir;
+                sheet.Cells["E" + row].Value = model.jumlah_jam;
+            }
+            else
+            {
+                sheet.Cells["B" + row].RichText.Add("\n" + message);
+            }
+
         }
 
         private bool CommitModelExists(int id)
@@ -335,6 +391,7 @@ namespace TimesheetGeneratorApp.Controllers
     {
         public int lastRow { set; get; }
         public ExcelWorksheet sheet { set; get; }
+        public string ck_date { set; get; }
     }
 
 }
