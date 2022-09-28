@@ -64,12 +64,13 @@ namespace TimesheetGeneratorApp.Controllers
         }        
         public async Task<IActionResult> generate(GenerateCommitModel generateCommit)
         {
+            TempData["generate"] = true;
+            TempData["generate_tanggal_mulai"] = generateCommit.tanggal_mulai;
+            TempData["generate_tanggal_selesai"] = generateCommit.tanggal_selesai;
+            TempData["generate_project_id"] = generateCommit.project_id;
+
             if (generateCommit.btn_generate.Equals("Tampilkan"))
             {
-                TempData["generate"] = true;
-                TempData["generate_tanggal_mulai"] = generateCommit.tanggal_mulai;
-                TempData["generate_tanggal_selesai"] = generateCommit.tanggal_selesai;
-                TempData["generate_project_id"] = generateCommit.project_id;
                 return RedirectToAction("Index");
             }
 
@@ -285,10 +286,12 @@ namespace TimesheetGeneratorApp.Controllers
             {
                 Dictionary<String, CheckExportSheet> chk_export = new Dictionary<string, CheckExportSheet>();
                 foreach (var item in data) {
-                    if (chk_export.ContainsKey(item.author_email) == false)
+                    string ws_name = item.author_email.Replace("@", "_");
+                    ws_name = ws_name.Replace(".", "_");
+                    if (chk_export.ContainsKey(ws_name) == false)
                     {
                         //Todo : create new sheet
-                        var worksheet = xlPackage.Workbook.Worksheets.Add(item.author_email);
+                        var worksheet = xlPackage.Workbook.Worksheets.Add(ws_name);
                         worksheet.Cells["A1"].RichText.Add("Nama").Bold = true;
                         worksheet.Cells["B1"].RichText.Add(item.author_name +" - "+item.author_email).Bold = true;
                         this.create_template_table(worksheet);
@@ -301,14 +304,14 @@ namespace TimesheetGeneratorApp.Controllers
                         checkExportSheet.ck_date = d_string;
                         checkExportSheet.currentRow = checkExportSheet.row_date[d_string];
                         checkExportSheet.lastRow = checkExportSheet.row_date[tgl_selesai.ToString("dd-MMM-yyyy")];
-                        chk_export[item.author_name] = checkExportSheet;
+                        chk_export[ws_name] = checkExportSheet;
 
                         this.add_row_table(worksheet, checkExportSheet.currentRow, item, true);
                     }
                     else
                     {
                         //Continue Avaible Sheet
-                        CheckExportSheet checkExportSheet = chk_export[item.author_name];
+                        CheckExportSheet checkExportSheet = chk_export[ws_name];
                         var worksheet = checkExportSheet.sheet;
                         
 
@@ -330,7 +333,7 @@ namespace TimesheetGeneratorApp.Controllers
                         this.add_row_table(worksheet, current, item, add_row);
                         checkExportSheet.currentRow = current;
                         checkExportSheet.ck_date = commit_date;
-                        chk_export[item.author_name] = checkExportSheet;
+                        chk_export[ws_name] = checkExportSheet;
 
                     }
                 }
@@ -367,7 +370,7 @@ namespace TimesheetGeneratorApp.Controllers
         public void create_template_table(ExcelWorksheet sheet)
         {
             sheet.Cells["A" + 4].RichText.Add("Tanggal").Bold = true;
-            sheet.Cells["B" + 4].RichText.Add("Kegitan").Bold = true;
+            sheet.Cells["B" + 4].RichText.Add("Kegiatan").Bold = true;
             sheet.Cells["C" + 4].RichText.Add("Jam mulai").Bold = true;
             sheet.Cells["D" + 4].RichText.Add("Jam Akhir").Bold = true;
             sheet.Cells["E" + 4].RichText.Add("Jumlah Jam").Bold = true;
@@ -384,11 +387,22 @@ namespace TimesheetGeneratorApp.Controllers
         }
         //TODO : membuat inisialisasi row tanggal pada excel kemudian mengembalikan index row pada masing-masing tanggal
         Dictionary<string, int> init_row_date(ExcelWorksheet sheet, DateTime d_start, DateTime d_end) {
+            Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#ffc8dd");
             Dictionary<string, int> row_date = new Dictionary<string, int>();
             int row_start = 5;
             for (var day = d_start; day.Date <= d_end.Date; day = day.AddDays(1)) {
+                string s_day = day.ToString("dddd");
                 sheet.Cells["A" + row_start].Value = day.ToString("dd-MMM-yyyy");
                 row_date.Add(day.ToString("dd-MMM-yyyy"), row_start);
+                
+                
+                if (s_day.ToLower().Equals("sabtu") || s_day.ToLower().Equals("minggu"))
+                {
+                    sheet.Cells["A" + row_start + ":E" + row_start].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    sheet.Cells["A" + row_start + ":E" + row_start].
+                        Style.Fill.BackgroundColor.SetColor(colFromHex);
+                }
+                
                 row_start += 1;
             }
             return row_date;
