@@ -68,18 +68,42 @@ namespace TimesheetGeneratorApp.Controllers
                 return RedirectToAction("Index");
             }
 
-
             //TODO: Generate API data
             var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.Id == generateCommit.project_id);
-
             var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
                                                     masterProjectModel.project_id,
                                                     masterProjectModel.accsess_token, 
                                                     generateCommit.tanggal_mulai.ToString(),
                                                     generateCommit.tanggal_selesai.ToString(),
                                                     "true", "true", "100");
+
+
+            //TODO: Filter Date If Exist In DB
+            var commitModelTanggalMulai = await _context.CommitModel
+                .FirstOrDefaultAsync(data => 
+                    (data.committed_date.Value.ToString().Contains(generateCommit.tanggal_mulai.ToString("yyy-MM-dd")))
+                    && (data.MasterProjectModelId == masterProjectModel.Id)
+                );
+           
+            if (commitModelTanggalMulai != null)
+            {
+                TempData["error_system"] = "Tanggal mulai yang dimasukkan telah tersedia di database";
+
+                return RedirectToAction("");
+            }
+
+            //TODO: Dont Save Data If Exist In DB
+            //Get data in Table CommitModel
+
+            //Check data message dari API === message dari DB
+
+            //IF Same Dont Save
+
+            //If Not Same Just Save
+
+
             //Todo : check error system
-            if(gitlabData == null)
+            if (gitlabData == null)
             {
                 return RedirectToAction("");
             }
