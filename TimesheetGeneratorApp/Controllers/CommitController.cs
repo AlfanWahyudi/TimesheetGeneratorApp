@@ -58,8 +58,8 @@ namespace TimesheetGeneratorApp.Controllers
                     .Where(m => m.MasterProjectModelId == (int)TempData["generate_project_id"])
                     .Where(m => m.committed_date >= new DateTime(tgl_mulai.Year, tgl_mulai.Month, tgl_mulai.Day, 0, 0, 0))
                     .Where(m => m.committed_date <= new DateTime(tgl_selesai.Year, tgl_selesai.Month, tgl_selesai.Day, 23, 59, 59))
-                    .OrderBy(m => m.author_name)
-                    .ThenBy(m => m.committed_date)
+                    .OrderBy(m => m.committed_date)
+                    .ThenBy(m => m.author_name)
                     .ToListAsync();
                 return View(data);
             }
@@ -92,12 +92,17 @@ namespace TimesheetGeneratorApp.Controllers
                 return RedirectToAction("");
             }
 
+            if(generateCommit.tanggal_selesai.Date >= DateTime.Now.Date)
+            {
+                generateCommit.tanggal_selesai = DateTime.Now.AddDays(-1);
+            }
+
             //TODO: Generate API data
             var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
                                                     masterProjectModel.project_id,
                                                     masterProjectModel.accsess_token,
-                                                    generateCommit.tanggal_mulai.ToString(),
-                                                    generateCommit.tanggal_selesai.ToString(),
+                                                    generateCommit.tanggal_mulai.ToString("dd/MM/yyyy"),
+                                                    generateCommit.tanggal_selesai.ToString("dd/MM/yyyy"),
                                                     "true", "true", "100");
 
             //Todo : check error system
