@@ -99,8 +99,8 @@ namespace TimesheetGeneratorApp.Controllers
             var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
                                                     masterProjectModel.project_id,
                                                     masterProjectModel.accsess_token,
-                                                    generateCommit.tanggal_mulai.ToString("yyyy/MM/dd"),
-                                                    generateCommit.tanggal_selesai.ToString("yyyy/MM/dd"),
+                                                    generateCommit.tanggal_mulai.ToString("yyyy/MM/dd") + "T00:00:00",
+                                                    generateCommit.tanggal_selesai.ToString("yyyy/MM/dd")+"T23:59:59",
                                                     "true", "true", "100");
 
             //Todo : check error system
@@ -175,7 +175,7 @@ namespace TimesheetGeneratorApp.Controllers
                         //Todo : create new sheet
                         var worksheet = xlPackage.Workbook.Worksheets.Add(item.author_name);
                         worksheet.Cells["A1"].RichText.Add("Nama").Bold = true;
-                        worksheet.Cells["B1"].RichText.Add(item.author_name + " - " + item.author_email).Bold = true;
+                        worksheet.Cells["B1"].RichText.Add(item.author_name).Bold = true;
                         this.create_template_table(worksheet);
 
 
