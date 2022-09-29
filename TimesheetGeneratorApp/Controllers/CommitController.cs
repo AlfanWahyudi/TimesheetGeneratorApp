@@ -78,24 +78,22 @@ namespace TimesheetGeneratorApp.Controllers
 
             var masterProjectModel = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(data => data.Id == generateCommit.project_id);
 
-            //TODO: Filter Date If Exist In DB
-            var commitModelTanggalMulai = await _context.CommitModel
-                .FirstOrDefaultAsync(data =>
-                    (data.committed_date.Value.ToString().Contains(generateCommit.tanggal_mulai.ToString("yyy-MM-dd")))
-                    && (data.MasterProjectModelId == masterProjectModel.Id)
-                );
+            // Remove dates in table CommitModel by range end date
+            DateTime endDate = generateCommit.tanggal_selesai.AddDays(1);
+            var commitModels = await _context.CommitModel
+                .Where(data => data.committed_date >= generateCommit.tanggal_mulai)
+                .Where(data => data.committed_date <= endDate)
+                .Where(data => data.MasterProjectModelId == masterProjectModel.Id)
+                .ToListAsync();
 
-            if (commitModelTanggalMulai != null)
+            if (commitModels != null)
             {
-                TempData["error_system"] = "Tanggal mulai yang dimasukkan telah tersedia di database";
-
-                return RedirectToAction("");
+                foreach(var commitModel in commitModels)
+                {
+                    _context.CommitModel.Remove(commitModel);
+                }
+                await _context.SaveChangesAsync();
             }
-
-            //if(generateCommit.tanggal_selesai.Date > DateTime.Now.Date)
-            //{
-            //    generateCommit.tanggal_selesai = DateTime.Now;
-            //}
 
             //TODO: Generate API data
             var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
