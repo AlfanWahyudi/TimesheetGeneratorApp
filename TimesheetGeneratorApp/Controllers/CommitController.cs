@@ -92,17 +92,17 @@ namespace TimesheetGeneratorApp.Controllers
                 return RedirectToAction("");
             }
 
-            if(generateCommit.tanggal_selesai.Date >= DateTime.Now.Date)
-            {
-                generateCommit.tanggal_selesai = DateTime.Now.AddDays(-1);
-            }
+            //if(generateCommit.tanggal_selesai.Date > DateTime.Now.Date)
+            //{
+            //    generateCommit.tanggal_selesai = DateTime.Now;
+            //}
 
             //TODO: Generate API data
             var gitlabData = _gitlabService.getList(masterProjectModel.host_url,
                                                     masterProjectModel.project_id,
                                                     masterProjectModel.accsess_token,
-                                                    generateCommit.tanggal_mulai.ToString("dd/MM/yyyy"),
-                                                    generateCommit.tanggal_selesai.ToString("dd/MM/yyyy"),
+                                                    generateCommit.tanggal_mulai.ToString("yyyy/MM/dd"),
+                                                    generateCommit.tanggal_selesai.ToString("yyyy/MM/dd"),
                                                     "true", "true", "100");
 
             //Todo : check error system
