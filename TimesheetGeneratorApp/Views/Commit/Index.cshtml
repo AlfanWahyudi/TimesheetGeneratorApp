@@ -61,7 +61,8 @@
                     <input type="hidden" name="project_id" value="@TempData["generate_project_id"]" />
                     <input type="hidden" name="tanggal_mulai" value="@TempData["generate_tanggal_mulai"]" />
                     <input type="hidden" name="tanggal_selesai" value="@TempData["generate_tanggal_selesai"]" />
-                    <button type="submit" class="btn btn-primary"><i class="fa fa-download" aria-hidden="true"></i> Download</button>
+                    <button name="export_type" type="submit" class="btn btn-success" value="excel"><i class="fa fa-download" aria-hidden="true"></i> Excel</button>
+                    <button name="export_type" type="submit" class="btn btn-primary" value="word"><i class="fa fa-download" aria-hidden="true"></i> Word</button>
                 </form>
             </div>
             <table class="table table-hover table-striped" id="dataTable">

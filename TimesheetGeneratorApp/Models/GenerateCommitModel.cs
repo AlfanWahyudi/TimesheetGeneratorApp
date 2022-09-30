@@ -7,5 +7,7 @@
 
         public string btn_generate { set; get; }
         public int project_id { set; get; }
+
+        public string export_type { set; get; }
     }
 }
