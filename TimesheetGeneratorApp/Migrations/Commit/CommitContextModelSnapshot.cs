@@ -33,6 +33,10 @@ namespace TimesheetGeneratorApp.Migrations.Commit
                     b.Property<int>("MasterProjectModelId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("author_email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("author_name")
                         .IsRequired()
                         .HasColumnType("text");
