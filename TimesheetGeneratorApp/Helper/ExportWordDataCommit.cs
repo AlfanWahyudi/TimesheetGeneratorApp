@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml;
 using TimesheetGeneratorApp.Models;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace TimesheetGeneratorApp.Helper
 {
@@ -23,9 +24,11 @@ namespace TimesheetGeneratorApp.Helper
             this.tgl_selesai = tgl_selesai;
         }
 
-        public void run()
+        public string run()
         {
-            using (var doc = WordprocessingDocument.Create("wwwroot/export/word/Export_word.docx", WordprocessingDocumentType.Document))
+            string fname = mp.name+" "+DateTime.Now.ToString("yyyy-MM-dd");
+            string pth = "export/word/"+fname+".docx";
+            using (var doc = WordprocessingDocument.Create("wwwroot/"+pth, WordprocessingDocumentType.Document))
             {
                 MainDocumentPart mainDocumentPart = doc.AddMainDocumentPart();
                 mainDocumentPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document();
@@ -36,9 +39,9 @@ namespace TimesheetGeneratorApp.Helper
                 int row_table = 1;
                 //Todo : Repeat data
                 foreach (CommitModel commit in this.data) {
-                    
+
                     //TODO : create new table
-                    if(dict_table_commit.ContainsKey(commit.author_email) == false)
+                    if (dict_table_commit.ContainsKey(commit.author_email) == false)
                     {
                         TabelCommit tabelCommit = new TabelCommit();
 
@@ -63,18 +66,28 @@ namespace TimesheetGeneratorApp.Helper
                         create_row_date(tbl, tabelCommit);
                         // Add the table to the document
                         body.AppendChild(tbl);
+                        for(int i=0; i<5; i++)
+                            body.AppendChild(
+                                new Paragraph());
+
 
                         tabelCommit.tbl = tbl;
+                        modify_row_table(tabelCommit, commit);
                         dict_table_commit.Add(commit.author_email, tabelCommit);
+
                         row_table += 1;
                     }
-                    else //TODO : Modify Table
+                    else
                     {
-
+                        //TODO : Modify Table
+                        TabelCommit tabelCommitAdd = dict_table_commit[commit.author_email];
+                        modify_row_table(tabelCommitAdd, commit);
+                        tabelCommitAdd.update = true;
+                        dict_table_commit[commit.author_email] = tabelCommitAdd;
                     }
-                    
                 }
             }
+            return pth;
         }
         //TODO : Membuat Header Tabel
         void create_header_table(int row_table ,Body body,Table tbl, String nama, String jabatan)
@@ -91,12 +104,89 @@ namespace TimesheetGeneratorApp.Helper
                     ));
             body.AppendChild(pr_jabatan);
 
-            // Create 1 row to the table.
+            //
+          
+
+            
             TableRow tr_head = new TableRow();
+            
+            Shading shading_head = new Shading()
+            {
+                Color = "auto",
+                Fill = "e63946",
+                Val = ShadingPatternValues.Clear
+            };
+            Color color = new Color() { Val = "ffffff"};
+            TableCellVerticalAlignment tcVA = new TableCellVerticalAlignment() { Val = TableVerticalAlignmentValues.Center };
+            Justification justification = new Justification() { Val = JustificationValues.Center };
+
+
+            RunProperties rp_head = new RunProperties();
+            rp_head.AppendChild(new Bold());
+            rp_head.AppendChild((Color)color.Clone());
+
+            ParagraphProperties pp_head = new ParagraphProperties();
+            pp_head.AppendChild((Justification)justification.Clone());
+
+
+
+            // properti run no
+            Paragraph p_no = new Paragraph();
+            p_no.ParagraphProperties = (ParagraphProperties)pp_head.Clone();
+            Run r_no = new Run(new Text("No"));
+            r_no.RunProperties = (RunProperties?)rp_head.Clone();
+            p_no.AppendChild(r_no);
+
+            // properti run tanggal
+            Paragraph p_tgl = new Paragraph();
+            p_tgl.ParagraphProperties = (ParagraphProperties)pp_head.Clone();
+            Run r_tgl = new Run(new Text("Tanggal"));
+            r_tgl.RunProperties = (RunProperties?)rp_head.Clone();
+            p_tgl.AppendChild(r_tgl);
+            // properti run kegiatan
+            Paragraph p_kegiatan = new Paragraph();
+            p_kegiatan.ParagraphProperties = (ParagraphProperties)pp_head.Clone();
+            Run r_kegiatan = new Run(new Text("Kegiatan"));
+            r_kegiatan.RunProperties = (RunProperties?)rp_head.Clone();
+            p_kegiatan.AppendChild(r_kegiatan);
+
+            //rp_no.AppendChild(new Bold());
+
             // Add a cell to each column in the row.
-            TableCell tc1 = new TableCell(new Paragraph(new Run(new Text("No"))));
-            TableCell tc2 = new TableCell(new Paragraph(new Run(new Text("Tanggal"))));
-            TableCell tc3 = new TableCell(new Paragraph(new Run(new Text("Kegiatan"))));
+            TableCell tc1 = new TableCell(p_no);
+            TableCell tc2 = new TableCell(p_tgl);
+            TableCell tc3 = new TableCell(p_kegiatan);
+            
+            //TODO : setup properties column no
+            TableCellWidth tcw_no = new TableCellWidth();
+            TableCellProperties tcp_no = new TableCellProperties();
+            
+
+            tcw_no.Width = "7%";
+            tcw_no.Type = TableWidthUnitValues.Pct;
+            tcp_no.AddChild(tcw_no);
+            tcp_no.AppendChild((Shading)shading_head.Clone());
+            tcp_no.AppendChild((TableCellVerticalAlignment)tcVA.Clone());
+            
+            tc1.AppendChild(tcp_no);
+
+            //TODO : setup properties column tanggal
+            TableCellWidth tcw_tgl = new TableCellWidth();
+            TableCellProperties tcp_tgl = new TableCellProperties();
+            tcw_tgl.Width = "40%";
+            
+            tcw_tgl.Type = TableWidthUnitValues.Pct;
+            tcp_tgl.AddChild(tcw_tgl);
+            tcp_tgl.AppendChild((Shading)shading_head.Clone());
+            tcp_tgl.AppendChild((TableCellVerticalAlignment)tcVA.Clone());
+            tc2.AppendChild(tcp_tgl);
+
+
+            TableCellProperties tcp_kegiatan = new TableCellProperties();
+            tcp_kegiatan.AppendChild((Shading)shading_head.Clone());
+            tcp_kegiatan.AppendChild((TableCellVerticalAlignment)tcVA.Clone());
+            tc3.TableCellProperties = tcp_kegiatan;
+
             tr_head.Append(tc1, tc2, tc3);
             tbl.Append(tr_head);
         }
@@ -134,6 +224,7 @@ namespace TimesheetGeneratorApp.Helper
                 tabelCommit.tc_1.Add(day.ToString(key_date_format), tc_1);
                 tabelCommit.tc_2.Add(day.ToString(key_date_format), tc_2);
                 tabelCommit.tc_3.Add(day.ToString(key_date_format), tc_3);
+                tabelCommit.update = false;
 
                 day = day.AddDays(1);
                 i += 1;
@@ -141,8 +232,16 @@ namespace TimesheetGeneratorApp.Helper
         }
 
         //TODO : Menambahkan row Tabel
-        void modify_row_table()
+        void modify_row_table(TabelCommit tabelCommit, CommitModel commit)
         {
+            DateTime d = (DateTime)commit.committed_date;
+            string key = d.Date.ToString(key_date_format);
+            
+            tabelCommit.tc_3[key].AppendChild(new Paragraph(
+                new Run(
+                        new Text(commit.message)
+                        )));
+            
 
         }
     }
@@ -153,7 +252,7 @@ namespace TimesheetGeneratorApp.Helper
         public Dictionary<string, TableCell> tc_1 { set; get; } //merujuk pada row dari cell 1
         public Dictionary<string, TableCell> tc_2 { set; get; }//merujuk pada row dari cell 2
         public Dictionary<string, TableCell> tc_3 { set; get; }//merujuk pada row dari cell 3
-        public Dictionary<string, bool> update { set; get; }
+        public bool update { set; get; }
 
     }
 }
