@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<HariLiburContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("HariLiburContext") ?? throw new InvalidOperationException("Connection string 'HariLiburContext' not found.")));
 builder.Services.AddDbContext<CommitContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("CommitContext") ?? throw new InvalidOperationException("Connection string 'CommitContext' not found.")));
 builder.Services.AddDbContext<MasterProjectContext>(options =>
