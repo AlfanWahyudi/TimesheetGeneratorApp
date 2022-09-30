@@ -21,16 +21,18 @@ namespace TimesheetGeneratorApp.Controllers
     {
         private readonly CommitContext _context;
         private readonly MasterProjectContext _context_mp;
+        private readonly HariLiburContext _hariLiburContext;
 
         private HttpClient _httpClient;
         private GitlabService _gitlabService;
 
         private ParameterModel parameterModel;
 
-        public CommitController(CommitContext context, MasterProjectContext context_mp)
+        public CommitController(CommitContext context, MasterProjectContext context_mp, HariLiburContext hariLiburContext)
         {
             _context = context;
             _context_mp = context_mp;
+            _hariLiburContext = hariLiburContext;
 
             _httpClient = new HttpClient();
             _gitlabService = new GitlabService(_httpClient, this);
@@ -149,15 +151,27 @@ namespace TimesheetGeneratorApp.Controllers
                 .Where(m => m.committed_date <= tgl_selesai)
                 .ToListAsync();
 
+            var hariLiburNasional = await _hariLiburContext.HariLiburModel
+                                            .Where(item => item.is_national_holiday == true)
+                                            .Where(item => item.holiday_date >= tgl_mulai)
+                                            .Where(item => item.holiday_date <= tgl_selesai)
+                                            .ToListAsync();
+
             var master_project = await _context_mp.MasterProjectModel.FirstOrDefaultAsync(m => m.Id == generateCommit.project_id);
             if (master_project == null)
             {
                 return RedirectToAction();
-                TempData["error_system"] = "TIdak ada data yang akan dicetak";
+                TempData["error_system"] = "Tidak ada data yang akan dicetak";
             }
             if (data.Count() == 0)
             {
-                TempData["error_system"] = "TIdak ada data yang akan dicetak";
+                TempData["error_system"] = "Tidak ada data yang akan dicetak";
+                return RedirectToAction("");
+            }
+
+            if (hariLiburNasional == null)
+            {
+                TempData["error_system"] = "Tidak ada data yang akan dicetak";
                 return RedirectToAction("");
             }
 
@@ -172,7 +186,7 @@ namespace TimesheetGeneratorApp.Controllers
             else
             {
                 ExportExcelDataCommit exportDataCommit = new ExportExcelDataCommit();
-                return File(exportDataCommit.export_to_excel(master_project,
+                return File(exportDataCommit.export_to_excel(master_project, hariLiburNasional,
                     data, tgl_mulai, tgl_selesai
                     ), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Timesheet " + master_project.name + ".xlsx");
             }

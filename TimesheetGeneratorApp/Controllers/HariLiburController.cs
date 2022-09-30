@@ -29,10 +29,10 @@ namespace TimesheetGeneratorApp.Controllers
         // GET: HariLibur
         public async Task<IActionResult> Index()
         {
-              return View(await _context.HariLiburModel.ToListAsync());
+            return View(await _context.HariLiburModel.ToListAsync());
         }
 
-        public async Task<IActionResult> generate(string year)
+        public async Task<IActionResult> Generate(string year)
         {
             var hariLiburService = _hariLiburService.getListByYear(year);
 
@@ -70,7 +70,7 @@ namespace TimesheetGeneratorApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string year)
         {
-            await this.generate(year);
+            await this.Generate(year);
 
             return RedirectToAction("Index");
         }
@@ -96,7 +96,7 @@ namespace TimesheetGeneratorApp.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            await this.generate(year);
+            await this.Generate(year);
 
             return RedirectToAction("Index");
         }
