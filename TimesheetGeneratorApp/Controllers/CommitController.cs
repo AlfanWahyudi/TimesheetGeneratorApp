@@ -180,8 +180,8 @@ namespace TimesheetGeneratorApp.Controllers
                 ExportWordDataCommit exportWordDataCommit = new ExportWordDataCommit(data,
                     master_project, tgl_mulai, tgl_selesai);
 
-                exportWordDataCommit.run();
-                return RedirectToAction("");
+                string pth_fname = exportWordDataCommit.run();
+                return LocalRedirect("~/"+pth_fname);
             }
             else
             {
