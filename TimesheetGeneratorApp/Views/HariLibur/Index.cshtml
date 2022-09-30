@@ -13,56 +13,82 @@
 <h1 class="mb-3">Data Hari Libur</h1>
 <partial name="~/Views/Shared/_alert_message.cshtml" />
 
-@if (Model.Count() == 0)
-{
-    <a asp-action="Create" class="btn btn-primary text-white mb-3">Add</a>
-} else {
-    <a asp-action="Edit" class="btn btn-primary text-white mb-3">Edit</a>
-}
-
 <div class="card mb-3">
     <div class="card-body">
         <div class="card-title mb-3">
-            <h3>Tabel Hari Libur Tahun</h3>
+            <h4>Generate Data</h4>
         </div>
-        <table class="table table-stripped table-hover" id="dataTable">
-            <thead>
-                <tr>
-                    <th>Tanggal</th>
-                    <th>Hari Libur</th>
-                    <th>Libur Nasional</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            @(((DateTime)item.holiday_date).ToString("dd MMM yyyy"))
-                        </td>
-                        <td>
-                            @item.holiday_name
-                        </td>   
-                        <td>
-                            @if (item.is_national_holiday)
-                            {
-                                <span class="badge bg-success">Y</span>
-                            } else {
-                                <span class="badge bg-danger">N</span>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <form asp-action="Generate" method="get" class="form-generate">
+            <div class="form-group mb-3">
+                <label class="form-label">Project</label>
+                <input type="text" class="form-control" name="year" required />
+            </div>
+            <div class=" form-group">
+                <input class="btn btn-primary" type="submit" name="btn_generate" value="Generate" />
+                <input class="btn btn-info" type="submit" name="btn_generate" value="Tampilkan" />
+            </div>
+        </form>
     </div>
 </div>
+
+
+@if (TempData["generate"] != null)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="card-title mb-3">
+                <h3>Tabel Hari Libur </h3>
+            </div>
+            <table class="table table-stripped table-hover" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Hari Libur</th>
+                        <th>Libur Nasional</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        string year = ((DateTime)item.holiday_date).ToString("yyyy");
+
+                        @if (year.Equals(TempData["year"]))
+                        {
+                            <tr>
+                                <td>
+                                    @(((DateTime)item.holiday_date).ToString("dd MMM yyyy"))
+                                </td>
+                                <td>
+                                    @item.holiday_name
+                                </td>
+                                <td>
+                                    @if (item.is_national_holiday)
+                                    {
+                                        <span class="badge bg-success">Y</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">N</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
 
 @section Scripts {
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" type="text/javascript"></script>
     <script type="text/javascript">
         $("#dataTable").DataTable({
             "ordering": false
+        });
+        $(".form-generate").on('submit', function () {
+            $("#loader").addClass('active');
+            return true;
         });
     </script>
 }

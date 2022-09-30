@@ -17,19 +17,18 @@ namespace TimesheetGeneratorApp.Helper
 {
     public class ExportExcelDataCommit
     {
-        private readonly CommitContext _context;
-        private readonly MasterProjectContext _context_mp;
-        Controller ctr;
-
+        private List<HariLiburModel> hariLiburModels;
         public  ExportExcelDataCommit()
         {
         
         }
 
         public MemoryStream export_to_excel(MasterProjectModel master_project,
-            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data,
-            DateTime tgl_mulai, DateTime tgl_selesai)
+                                            List<HariLiburModel> hariLibur,
+                                            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data,
+                                            DateTime tgl_mulai, DateTime tgl_selesai)
         {
+            hariLiburModels = hariLibur;
             var stream = new MemoryStream();
             using (var xlPackage = new ExcelPackage(stream))
             {
@@ -136,17 +135,23 @@ namespace TimesheetGeneratorApp.Helper
 
             int row_start = 5;
             var day = d_start;
+
             while (day.Date <= d_end.Date)
             {
                 string s_day = day.ToString("dddd");
                 sheet.Cells["A" + row_start].Value = day.ToString("dd-MMM-yyyy");
                 row_date.Add(day.ToString("dd-MMM-yyyy"), row_start);
 
-                if (s_day.ToLower().Equals("saturday") || s_day.ToLower().Equals("sunday"))
+                foreach (var hariLiburNasional in hariLiburModels)
                 {
-                    sheet.Cells["A" + row_start + ":E" + row_start].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    sheet.Cells["A" + row_start + ":E" + row_start].
-                        Style.Fill.BackgroundColor.SetColor(colFromHex);
+                    if (s_day.ToLower().Equals("saturday") ||
+                        s_day.ToLower().Equals("sunday") ||
+                        day == hariLiburNasional.holiday_date)
+                    {
+                        sheet.Cells["A" + row_start + ":E" + row_start].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        sheet.Cells["A" + row_start + ":E" + row_start].
+                            Style.Fill.BackgroundColor.SetColor(colFromHex);
+                    }
                 }
                 row_start += 1;
                 day = day.AddDays(1);

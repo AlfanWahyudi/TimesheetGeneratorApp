@@ -29,11 +29,30 @@ namespace TimesheetGeneratorApp.Controllers
         // GET: HariLibur
         public async Task<IActionResult> Index()
         {
-              return View(await _context.HariLiburModel.ToListAsync());
+            return View(await _context.HariLiburModel.ToListAsync());
         }
 
-        public async Task<IActionResult> generate(string year)
+        public async Task<IActionResult> Generate(string year, string btn_generate)
         {
+            TempData["generate"] = true;
+            TempData["year"] = year;
+
+            if (btn_generate.Equals("Tampilkan"))
+            {
+                return RedirectToAction("Index");
+            }
+
+            var hariLiburModels = await _context.HariLiburModel.ToListAsync();
+
+            if (hariLiburModels != null)
+            {
+                foreach (var hariLiburModel in hariLiburModels)
+                {
+                    _context.HariLiburModel.Remove(hariLiburModel);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
             var hariLiburService = _hariLiburService.getListByYear(year);
 
             if (hariLiburService == null)
@@ -55,55 +74,6 @@ namespace TimesheetGeneratorApp.Controllers
 
             TempData["message_success"] = "Berhasil melakukan generate data";
             return RedirectToAction("index");
-        }
-
-        // GET: HariLibur/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: HariLibur/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string year)
-        {
-            await this.generate(year);
-
-            return RedirectToAction("Index");
-        }
-
-        // GET: HariLibur/Edit/5
-        public IActionResult Edit()
-        {
-            return View();
-        }
-
-        // POST: HariLibur/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string year)
-        {
-            var hariLiburModel = await _context.HariLiburModel.ToListAsync();
-
-            foreach (var item in hariLiburModel)
-            {
-                _context.HariLiburModel.Remove(item);
-                await _context.SaveChangesAsync();
-            }
-
-            await this.generate(year);
-
-            return RedirectToAction("Index");
-        }
-
-        private bool HariLiburModelExists(int id)
-        {
-          return _context.HariLiburModel.Any(e => e.Id == id);
         }
     }
 }
