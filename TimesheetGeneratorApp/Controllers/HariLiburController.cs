@@ -36,13 +36,23 @@ namespace TimesheetGeneratorApp.Controllers
         {
             TempData["generate"] = true;
             TempData["year"] = year;
+            int int_year;
+            bool cek_year = int.TryParse(year, out int_year);
 
+            if (cek_year == false)
+            {
+                TempData["error_system"] = "Perhatikan inputan anda. Tipe data " +
+                    "yang diinputkan mesti number atau angka";
+                return RedirectToAction("Index");
+            }
             if (btn_generate.Equals("Tampilkan"))
             {
                 return RedirectToAction("Index");
             }
 
-            var hariLiburModels = await _context.HariLiburModel.ToListAsync();
+            var hariLiburModels = await _context.HariLiburModel
+                .Where(m => m.holiday_date.Value.Year == int_year).
+                ToListAsync();
 
             if (hariLiburModels != null)
             {
