@@ -2,22 +2,25 @@
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml;
 using TimesheetGeneratorApp.Models;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using DocumentFormat.OpenXml.Bibliography;
+using System.Text.RegularExpressions;
 
 namespace TimesheetGeneratorApp.Helper
 {
     public class ExportWordDataCommit
     {
         IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data;
+        private List<HariLiburModel> hariLiburModels;
         MasterProjectModel mp;
         DateTime tgl_mulai;
         DateTime tgl_selesai;
         String key_date_format = "yyyyMMdd";
-        public ExportWordDataCommit(IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data,
-            MasterProjectModel mp, DateTime tgl_mulai,
+        public ExportWordDataCommit(
+            MasterProjectModel mp,
+            List<HariLiburModel> hariLiburModels,
+            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data,
+             DateTime tgl_mulai,
             DateTime tgl_selesai){
-
+            this.hariLiburModels = hariLiburModels;
             this.data = data;
             this.mp = mp;
             this.tgl_mulai = tgl_mulai;
@@ -33,6 +36,24 @@ namespace TimesheetGeneratorApp.Helper
                 MainDocumentPart mainDocumentPart = doc.AddMainDocumentPart();
                 mainDocumentPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document();
 
+                NumberingDefinitionsPart numberingPart =
+                    mainDocumentPart.AddNewPart<NumberingDefinitionsPart>("id_1");
+                Numbering element =
+                  new Numbering(
+                    new AbstractNum(
+                      new Level(
+                        new NumberingFormat() { Val = NumberFormatValues.Bullet }
+                        //new LevelText() { Val = "." }
+                      )
+                      { LevelIndex = 0 }
+                    )
+                    { AbstractNumberId = 1 },
+                    new NumberingInstance(
+                      new AbstractNumId() { Val = 1 }
+                    )
+                    { NumberID = 1 });
+                element.Save(numberingPart);
+
                 Body body = mainDocumentPart.Document.AppendChild(new Body());
 
                 Dictionary<string, TabelCommit> dict_table_commit = new Dictionary<string, TabelCommit>();
@@ -46,12 +67,17 @@ namespace TimesheetGeneratorApp.Helper
                         TabelCommit tabelCommit = new TabelCommit();
 
                         Table tbl = new Table();
+                        
                         // Set the style and width for the table.
                         TableProperties tableProp = new TableProperties();
                         TableStyle tableStyle = new TableStyle() { Val = "TableGrid" };
-
+                        //tableProp.AppendChild(
+                        //     new TableCellSpacing() { Width = "200", Type = TableWidthUnitValues.Dxa }
+                        //);
+                       
                         // Make the table width 100% of the page width.
-                        TableWidth tableWidth = new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct };
+                        TableWidth tableWidth = new TableWidth() { Width = "5000", 
+                            Type = TableWidthUnitValues.Pct };
                         // Apply
                         tableProp.Append(tableStyle, tableWidth);
                         tbl.AppendChild(tableProp);
@@ -60,18 +86,55 @@ namespace TimesheetGeneratorApp.Helper
                         TableGrid tg = new TableGrid(new GridColumn(), new GridColumn(), new GridColumn());
                         tbl.AppendChild(tg);
 
+                        //// Create Table Borders
+
+                        TableBorders tblBorders = new TableBorders();
+                        string border_color = "f27059";
+                        TopBorder topBorder = new TopBorder();
+                        topBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                        topBorder.Color = border_color;
+                        tblBorders.AppendChild(topBorder);
+
+                        BottomBorder bottomBorder = new BottomBorder();
+                        bottomBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                        bottomBorder.Color = border_color;
+                        tblBorders.AppendChild(bottomBorder);
+
+                        RightBorder rightBorder = new RightBorder();
+                        rightBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                        rightBorder.Color = border_color;
+                        tblBorders.AppendChild(rightBorder);
+
+                        LeftBorder leftBorder = new LeftBorder();
+                        leftBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                        leftBorder.Color = border_color;
+                        tblBorders.AppendChild(leftBorder);
+
+                        InsideHorizontalBorder insideHBorder = new InsideHorizontalBorder();
+                        insideHBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                        insideHBorder.Color = border_color;
+                        tblBorders.AppendChild(insideHBorder);
+
+                        InsideVerticalBorder insideVBorder = new InsideVerticalBorder();
+                        insideVBorder.Val = new EnumValue<BorderValues>(BorderValues.Thick);
+                        insideVBorder.Color = border_color;
+                        tblBorders.AppendChild(insideVBorder);
+
+                        tableProp.AppendChild(tblBorders);
+
                         //create header
                         create_header_table(row_table, body, tbl, commit.author_name, "");
                         //init row date
                         create_row_date(tbl, tabelCommit);
                         // Add the table to the document
                         body.AppendChild(tbl);
-                        for(int i=0; i<5; i++)
+                        for(int i=0; i<1; i++)
                             body.AppendChild(
                                 new Paragraph());
 
 
                         tabelCommit.tbl = tbl;
+                        tabelCommit.index_table = row_table;
                         modify_row_table(tabelCommit, commit);
                         dict_table_commit.Add(commit.author_email, tabelCommit);
 
@@ -82,7 +145,6 @@ namespace TimesheetGeneratorApp.Helper
                         //TODO : Modify Table
                         TabelCommit tabelCommitAdd = dict_table_commit[commit.author_email];
                         modify_row_table(tabelCommitAdd, commit);
-                        tabelCommitAdd.update = true;
                         dict_table_commit[commit.author_email] = tabelCommitAdd;
                     }
                 }
@@ -92,23 +154,36 @@ namespace TimesheetGeneratorApp.Helper
         //TODO : Membuat Header Tabel
         void create_header_table(int row_table ,Body body,Table tbl, String nama, String jabatan)
         {
+            SpacingBetweenLines spacing = new SpacingBetweenLines() { Line = "240", LineRule = LineSpacingRuleValues.Auto, Before = "0", After = "0" };
+            ParagraphProperties pp_default = new ParagraphProperties();
+            pp_default.AppendChild(spacing);
+            
+
+            Run r_name = new Run();
+            r_name.AppendChild(
+                new RunProperties(new Bold())
+                );
+            r_name.AppendChild(new Text(
+                row_table.ToString() + ". " + nama
+                ));
             Paragraph pr_name = new Paragraph(
-                    new Run(
-                        new Text(row_table.ToString()+". "+nama)
-                        ));
+                    r_name);
+            pr_name.ParagraphProperties = (ParagraphProperties)pp_default.Clone();
+            if (row_table > 1)
+                pr_name.ParagraphProperties.AppendChild(new PageBreakBefore());
             body.AppendChild(pr_name);
 
             Paragraph pr_jabatan = new Paragraph(
                 new Run(
                     new Text("Jabatan : ")
                     ));
+            pr_jabatan.ParagraphProperties = (ParagraphProperties)pp_default.Clone();
             body.AppendChild(pr_jabatan);
-
-            //
-          
-
             
-            TableRow tr_head = new TableRow();
+            TableRow tr_head = new TableRow(new TableRowProperties(
+                new TableRowHeight() { Val = 800, HeightType= HeightRuleValues.Exact},
+                new TableHeader()
+                ));
             
             Shading shading_head = new Shading()
             {
@@ -127,9 +202,7 @@ namespace TimesheetGeneratorApp.Helper
 
             ParagraphProperties pp_head = new ParagraphProperties();
             pp_head.AppendChild((Justification)justification.Clone());
-
-
-
+            pp_head.AppendChild((ParagraphProperties)pp_default.Clone());
             // properti run no
             Paragraph p_no = new Paragraph();
             p_no.ParagraphProperties = (ParagraphProperties)pp_head.Clone();
@@ -189,30 +262,67 @@ namespace TimesheetGeneratorApp.Helper
 
             tr_head.Append(tc1, tc2, tc3);
             tbl.Append(tr_head);
+
         }
 
         //TODO : create row date
         void create_row_date(Table tbl, TabelCommit tabelCommit)
         {
+            Shading shading_holiday = new Shading()
+            {
+                Color = "auto",
+                Fill = "cad2c5",
+                Val = ShadingPatternValues.Clear
+            };
+            TableCellProperties tcp_def = new TableCellProperties();
+            tcp_def.AppendChild(
+                new TableCellMargin(
+                    new LeftMargin() { Width = "100", Type = TableWidthUnitValues.Dxa }
+                    ));
+            
+            //Membuat settingan default paragraph
+            SpacingBetweenLines spacing = new SpacingBetweenLines() 
+            { Line = "240", LineRule = LineSpacingRuleValues.Auto, 
+                Before = "250", After = "100" }; //membuat spasi pada paragraph
+            Justification justification = new Justification() { Val = JustificationValues.Center };
+            ParagraphProperties pp_default = new ParagraphProperties();
+            pp_default.AppendChild(justification);
+            pp_default.AppendChild((SpacingBetweenLines)spacing.Clone());
+
+            ParagraphProperties pp_date = new ParagraphProperties();
+            pp_date.AppendChild((SpacingBetweenLines)spacing.Clone());
+
             var day = this.tgl_mulai.Date;
             int i = 1;
-            tabelCommit.tc_1 = new Dictionary<string, TableCell>();
-            tabelCommit.tc_2 = new Dictionary<string, TableCell>();
             tabelCommit.tc_3 = new Dictionary<string, TableCell>();
+            tabelCommit.update = new Dictionary<string, bool>();
 
             while (day <= this.tgl_selesai.Date)
             {
                 TableRow tr = new TableRow();
-                TableCell tc_1 = new TableCell(
-                    new Paragraph(
-                        new Run(
+                //column no
+                Paragraph p_no = new Paragraph();
+                p_no.ParagraphProperties = (ParagraphProperties)pp_default.Clone();
+                p_no.AppendChild(new Run(
                             new Text(i.ToString())
-                            )));
-                TableCell tc_2 = new TableCell(
-                    new Paragraph(
-                        new Run(
-                            new Text(day.ToString("dddd, dd MMMM yyyy"))
-                            )));
+                            ));
+                //TableCellProperties tcp_1 = new TableCellProperties();
+                //tcp_1.AppendChild((Shading)shading_holiday.Clone());
+
+                TableCell tc_1 = new TableCell(p_no);
+                //tc_1.TableCellProperties = (TableCellProperties)tcp_def.Clone();
+                //tc_1.TableCellProperties = tcp_1;
+
+                //column date
+                Paragraph p_date = new Paragraph();
+                p_date.ParagraphProperties = (ParagraphProperties)pp_date.Clone();
+                p_date.AppendChild(new Run(
+                            new Text(day.ToString("dddd, dd MMM yyyy"))
+                            ));
+                TableCell tc_2 = new TableCell(p_date);
+                tc_2.TableCellProperties = (TableCellProperties)tcp_def.Clone();
+
+
                 TableCell tc_3 = new TableCell(
                     new Paragraph(
                         new Run(
@@ -221,10 +331,18 @@ namespace TimesheetGeneratorApp.Helper
 
                 tr.Append(tc_1, tc_2, tc_3);
                 tbl.Append(tr);
-                tabelCommit.tc_1.Add(day.ToString(key_date_format), tc_1);
-                tabelCommit.tc_2.Add(day.ToString(key_date_format), tc_2);
                 tabelCommit.tc_3.Add(day.ToString(key_date_format), tc_3);
-                tabelCommit.update = false;
+                tabelCommit.update.Add(day.ToString(key_date_format), false);
+
+
+                string dayName = day.ToString("dddd").ToLower();
+                if(dayName.Equals("saturday") == true |
+                   dayName.Equals("sunday") == true | isNasionalHoliday(day) == true)
+                {
+                    tc_2.TableCellProperties.AppendChild((Shading)shading_holiday.Clone());
+                    tc_1.TableCellProperties = new TableCellProperties((Shading)shading_holiday.Clone());
+                    tc_3.TableCellProperties = new TableCellProperties((Shading)shading_holiday.Clone());
+                }
 
                 day = day.AddDays(1);
                 i += 1;
@@ -236,23 +354,82 @@ namespace TimesheetGeneratorApp.Helper
         {
             DateTime d = (DateTime)commit.committed_date;
             string key = d.Date.ToString(key_date_format);
-            
-            tabelCommit.tc_3[key].AppendChild(new Paragraph(
-                new Run(
-                        new Text(commit.message)
-                        )));
-            
+            if (tabelCommit.update[key] == false)
+            {
+                Shading shading_holiday = new Shading()
+                {
+                    Color = "auto",
+                    Fill = "cad2c5",
+                    Val = ShadingPatternValues.Clear
+                };
+                TableCellProperties tcp_def = new TableCellProperties();
+                tcp_def.AppendChild(
+                    new TableCellMargin(
+                        new LeftMargin() { Width = "100", Type = TableWidthUnitValues.Dxa },
+                        new RightMargin() { Width = "100", Type = TableWidthUnitValues.Dxa },
+                        new BottomMargin() { Width = "100", Type = TableWidthUnitValues.Dxa }
+                        ));
+                tabelCommit.tc_3[key].RemoveAllChildren();
 
+                string dayName = d.ToString("dddd").ToLower();
+
+                if (dayName.Equals("saturday") == true |
+                   dayName.Equals("sunday") == true | isNasionalHoliday(d) == true)
+                {
+                    tcp_def.AppendChild((Shading)shading_holiday.Clone());
+                }
+
+                tabelCommit.tc_3[key].TableCellProperties = tcp_def;
+
+                tabelCommit.update[key] = true;
+            }
+            SpacingBetweenLines spacing = new SpacingBetweenLines()
+            {
+                Line = "240",
+                LineRule = LineSpacingRuleValues.Auto,
+                Before = "100",
+                After = "0"
+            }; //membuat spasi pada paragraph
+
+            Regex pattern = new Regex("[\n]{2}");
+            Regex pattern_last_newline = new Regex("[.+\n]$");
+
+            string message = pattern.Replace(commit.message, "\n");
+            message = pattern_last_newline.Replace(message, "");
+            message = message.Replace("\t", "");
+
+            
+            ParagraphProperties pp = new ParagraphProperties(spacing);
+
+            Paragraph p = new Paragraph(
+                pp,
+                new Run(
+                  new RunProperties(),
+                  new Text(message)
+                  { Space = SpaceProcessingModeValues.Preserve })
+                );
+            tabelCommit.tc_3[key].AppendChild(p);
+
+        }
+
+        //TODO : Chek libur nasional
+        bool isNasionalHoliday(DateTime d)
+        {
+            foreach (var hariLiburNasional in hariLiburModels)
+            {
+                if (d.Date == hariLiburNasional.holiday_date.Value.Date)
+                    return true;
+            }
+            return false;
         }
     }
 
     class TabelCommit
     {
         public Table tbl { set; get; }
-        public Dictionary<string, TableCell> tc_1 { set; get; } //merujuk pada row dari cell 1
-        public Dictionary<string, TableCell> tc_2 { set; get; }//merujuk pada row dari cell 2
         public Dictionary<string, TableCell> tc_3 { set; get; }//merujuk pada row dari cell 3
-        public bool update { set; get; }
+        public Dictionary<string,bool> update { set; get; }
+        public int index_table { set; get; }
 
     }
 }

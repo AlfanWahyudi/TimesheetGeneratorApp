@@ -12,23 +12,33 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Color = System.Drawing.Color;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Office2016.Excel;
 
 namespace TimesheetGeneratorApp.Helper
 {
     public class ExportExcelDataCommit
     {
         private List<HariLiburModel> hariLiburModels;
-        public  ExportExcelDataCommit()
+        MasterProjectModel master_project;
+        IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data;
+        DateTime tgl_mulai,  tgl_selesai;
+        string checkDatePattern = "yyyyMMdd";
+        public  ExportExcelDataCommit(MasterProjectModel master_project, 
+            List<HariLiburModel> hariLibur, 
+            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data,
+            DateTime tgl_mulai, DateTime tgl_selesai)
         {
-        
+            this.hariLiburModels = hariLibur;
+            this.master_project = master_project;
+            this.data = data;
+            this.tgl_mulai = tgl_mulai;
+            this.tgl_selesai = tgl_selesai;
         }
 
-        public MemoryStream export_to_excel(MasterProjectModel master_project,
-                                            List<HariLiburModel> hariLibur,
-                                            IEnumerable<TimesheetGeneratorApp.Models.CommitModel> data,
-                                            DateTime tgl_mulai, DateTime tgl_selesai)
+        public MemoryStream run()
         {
-            hariLiburModels = hariLibur;
+            
             var stream = new MemoryStream();
             using (var xlPackage = new ExcelPackage(stream))
             {
@@ -135,28 +145,37 @@ namespace TimesheetGeneratorApp.Helper
 
             int row_start = 5;
             var day = d_start;
-
+            
             while (day.Date <= d_end.Date)
             {
                 string s_day = day.ToString("dddd");
                 sheet.Cells["A" + row_start].Value = day.ToString("dd-MMM-yyyy");
                 row_date.Add(day.ToString("dd-MMM-yyyy"), row_start);
 
-                foreach (var hariLiburNasional in hariLiburModels)
+                //Cek hari libur sabtu dan minggu
+                if (s_day.ToLower().Equals("saturday") |
+                        s_day.ToLower().Equals("sunday") 
+                        | isNasionalHoliday(day) == true) // check hari libur nasional
                 {
-                    if (s_day.ToLower().Equals("saturday") ||
-                        s_day.ToLower().Equals("sunday") ||
-                        day == hariLiburNasional.holiday_date)
-                    {
-                        sheet.Cells["A" + row_start + ":E" + row_start].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        sheet.Cells["A" + row_start + ":E" + row_start].
-                            Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    }
+                    sheet.Cells["A" + row_start + ":E" + row_start].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    sheet.Cells["A" + row_start + ":E" + row_start].
+                        Style.Fill.BackgroundColor.SetColor(colFromHex);
                 }
+                 
                 row_start += 1;
                 day = day.AddDays(1);
             }
             return row_date;
+        }
+        //TODO : Chek libur nasional
+        bool isNasionalHoliday(DateTime d)
+        {
+            foreach (var hariLiburNasional in hariLiburModels)
+            {
+                if(d.Date == hariLiburNasional.holiday_date.Value.Date)
+                    return true;
+            }
+            return false;
         }
         //Todo : Menambah row excel
         public void add_row_table(ExcelWorksheet sheet, int row, CommitModel model, bool add_row)
@@ -166,6 +185,7 @@ namespace TimesheetGeneratorApp.Helper
 
             string message = pattern.Replace(model.message, "\n");
             message = pattern_last_newline.Replace(message, "");
+            message = message.Replace("\t", "");
             if (add_row == true)
             {
 

@@ -8,6 +8,14 @@
 @section Css {
     <link href="https: //cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" rel="stylesheet" />
     <partial name="~/Views/Shared/_loader.cshtml" />
+    <style>
+        .th_date{
+            width : 100px !important;
+        }
+        .th_name{
+            width : 200px !important;
+        }
+    </style>
 }
 <h1 class="mb-3">Data commit</h1>
 <partial name="~/Views/Shared/_alert_message.cshtml" />
@@ -68,16 +76,17 @@
             <table class="table table-hover table-striped" id="dataTable">
                 <thead>
                     <tr>
-                        <th>
+                        <th class="th_date">
+                            @Html.DisplayNameFor(model => model.committed_date)
+                        </th>
+                        <th class="th_name">
                             @Html.DisplayNameFor(model => model.author_name)
                         </th>
                         <th>
                             @Html.DisplayNameFor(model => model.message)
                         </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.committed_date)
-                        </th>
-                        <th>
+                        
+                        <th >
                             @Html.DisplayNameFor(model => model.jam_mulai)
                         </th>
                         <th>
@@ -94,15 +103,16 @@
                     {
                         <tr>
                             <td>
+                                @(((DateTime)item.committed_date).ToString("dd MMM yyyy"))
+
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.author_name)
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.message)
                             </td>
-                            <td>
-                                @(((DateTime)item.committed_date).ToString("dd MMM yyyy"))
-                                
-                            </td>
+                            
                             <td>
                                 @Html.DisplayFor(modelItem => item.jam_mulai)
                             </td>

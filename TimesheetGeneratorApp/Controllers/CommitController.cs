@@ -177,18 +177,20 @@ namespace TimesheetGeneratorApp.Controllers
 
             if (generateCommit.export_type.Equals("word"))
             {
-                ExportWordDataCommit exportWordDataCommit = new ExportWordDataCommit(data,
-                    master_project, tgl_mulai, tgl_selesai);
+                ExportWordDataCommit exportWordDataCommit = 
+                    new ExportWordDataCommit(master_project, hariLiburNasional,
+                    data, tgl_mulai, tgl_selesai);
 
                 string pth_fname = exportWordDataCommit.run();
                 return LocalRedirect("~/"+pth_fname);
             }
             else
             {
-                ExportExcelDataCommit exportDataCommit = new ExportExcelDataCommit();
-                return File(exportDataCommit.export_to_excel(master_project, hariLiburNasional,
-                    data, tgl_mulai, tgl_selesai
-                    ), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Timesheet " + master_project.name + ".xlsx");
+                ExportExcelDataCommit exportDataCommit = 
+                    new ExportExcelDataCommit(master_project, hariLiburNasional,
+                    data, tgl_mulai, tgl_selesai);
+
+                return File(exportDataCommit.run(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Timesheet " + master_project.name + ".xlsx");
             }
         }
         private bool CommitModelExists(int id)
