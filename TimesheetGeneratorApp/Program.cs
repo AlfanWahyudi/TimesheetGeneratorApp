@@ -5,6 +5,8 @@ using TimesheetGeneratorApp.Data;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 
+var LocaleIND = "in-ID";
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<HariLiburContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("HariLiburContext") ?? throw new InvalidOperationException("Connection string 'HariLiburContext' not found.")));
@@ -30,15 +32,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 var supportedCultures = new[]{
-    new CultureInfo("en-US")
+    new CultureInfo(LocaleIND)
 };
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
-    DefaultRequestCulture = new RequestCulture("en-US"),
+    DefaultRequestCulture = new RequestCulture(LocaleIND),
     SupportedCultures = supportedCultures,
     FallBackToParentCultures = false
 });
-CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CreateSpecificCulture(LocaleIND);
 
 
 app.UseHttpsRedirection();
