@@ -336,8 +336,8 @@ namespace TimesheetGeneratorApp.Helper
 
 
                 string dayName = day.ToString("dddd").ToLower();
-                if(dayName.Equals("saturday") == true |
-                   dayName.Equals("sunday") == true | isNasionalHoliday(day) == true)
+                if(dayName.Equals("sabtu") == true |
+                   dayName.Equals("minggu") == true | isNasionalHoliday(day) == true)
                 {
                     tc_2.TableCellProperties.AppendChild((Shading)shading_holiday.Clone());
                     tc_1.TableCellProperties = new TableCellProperties((Shading)shading_holiday.Clone());
@@ -373,8 +373,8 @@ namespace TimesheetGeneratorApp.Helper
 
                 string dayName = d.ToString("dddd").ToLower();
 
-                if (dayName.Equals("saturday") == true |
-                   dayName.Equals("sunday") == true | isNasionalHoliday(d) == true)
+                if (dayName.Equals("sabtu") == true |
+                   dayName.Equals("minggu") == true | isNasionalHoliday(d) == true)
                 {
                     tcp_def.AppendChild((Shading)shading_holiday.Clone());
                 }

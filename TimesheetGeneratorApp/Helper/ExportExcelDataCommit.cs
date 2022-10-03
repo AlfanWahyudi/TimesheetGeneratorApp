@@ -153,8 +153,8 @@ namespace TimesheetGeneratorApp.Helper
                 row_date.Add(day.ToString("dd-MMM-yyyy"), row_start);
 
                 //Cek hari libur sabtu dan minggu
-                if (s_day.ToLower().Equals("saturday") |
-                        s_day.ToLower().Equals("sunday") 
+                if (s_day.ToLower().Equals("sabtu") |
+                        s_day.ToLower().Equals("minggu") 
                         | isNasionalHoliday(day) == true) // check hari libur nasional
                 {
                     sheet.Cells["A" + row_start + ":E" + row_start].Style.Fill.PatternType = ExcelFillStyle.Solid;
